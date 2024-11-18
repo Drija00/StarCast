@@ -1,12 +1,8 @@
 package com.example.Stars.controllers;
 
-import com.example.Stars.api.PostStarCommand;
-import com.example.Stars.query.GetStarsQuery;
+import com.example.Stars.read_model.FollowSummary;
 import com.example.Stars.read_model.StarSummary;
-import com.example.Stars.service.StarService;
-import org.axonframework.commandhandling.gateway.CommandGateway;
-import org.axonframework.messaging.responsetypes.ResponseTypes;
-import org.axonframework.queryhandling.QueryGateway;
+import com.example.Stars.service.FollowService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,25 +11,23 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
-public class StarController {
+public class FollowController {
 
-    private final StarService starService;
+    private final FollowService followService;
 
-    public StarController(StarService starService) {
-        this.starService = starService;
+    public FollowController(FollowService followService) {
+        this.followService = followService;
     }
 
-    @PostMapping("/star")
-    public void handle(@RequestBody StarSummary star) {
-        if(star != null) {
+    @PostMapping("/follow")
+    public void handle(@RequestBody FollowSummary followSummary) {
+        if(followSummary != null) {
             try {
-                starService.handle(star);
+                followService.handle(followSummary);
             } catch (Exception e) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
             }
@@ -42,8 +36,8 @@ public class StarController {
         }
     }
 
-    @GetMapping("/stars")
-    public CompletableFuture<ResponseEntity<List<StarSummary>>> getStars() {
-        return starService.getStars();
+    @GetMapping("/follows")
+    public CompletableFuture<ResponseEntity<List<FollowSummary>>> getFollows(){
+        return followService.getFollows();
     }
 }

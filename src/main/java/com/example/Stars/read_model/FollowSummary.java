@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -26,9 +27,9 @@ public class FollowSummary {
     private UserSummary followee;
 
     @Column(nullable = false)
-    private LocalDate timestamp;
+    private LocalDateTime timestamp;
 
-    public FollowSummary(UUID followId, UserSummary follower, UserSummary followee, LocalDate timestamp) {
+    public FollowSummary(UUID followId, UserSummary follower, UserSummary followee, LocalDateTime timestamp) {
         this.followId = followId;
         this.follower = follower;
         this.followee = followee;
