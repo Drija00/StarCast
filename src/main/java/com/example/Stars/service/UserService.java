@@ -1,6 +1,8 @@
 package com.example.Stars.service;
 
+import com.example.Stars.api.LoggingCommand;
 import com.example.Stars.api.RegisterUserCommand;
+import com.example.Stars.api.UserLogingEvent;
 import com.example.Stars.query.GetLoginUserQuery;
 import com.example.Stars.query.GetUserForRegistrationQuery;
 import com.example.Stars.query.GetUsersQuery;
@@ -14,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -51,10 +52,32 @@ public class UserService {
 
     }
 
-    public CompletableFuture<ResponseEntity<UserSummary>> login(String username, String password) {
-        return queryGateway.query(new GetLoginUserQuery(username, password), ResponseTypes.instanceOf(UserSummary.class))
-                .thenApply(u -> ResponseEntity.ok(u)).exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+
+    public CompletableFuture<ResponseEntity<?>> login(String username, String password) {
+        UserSummary u = queryGateway.query(new GetLoginUserQuery(username, password), ResponseTypes.instanceOf(UserSummary.class)).join();
+        if (u != null) {
+            return commandGateway.send(new LoggingCommand(u.getUserId(),true)).thenApply(success -> ResponseEntity.ok(success));
+        }
+        return CompletableFuture.completedFuture(ResponseEntity.notFound().build());
     }
+
+    public CompletableFuture<ResponseEntity<?>> logout(UUID userId) {
+        /*return queryGateway.query(new GetLoginUserQuery(username, password), ResponseTypes.instanceOf(UserSummary.class))
+                .thenCompose(user -> {
+                    if (user != null) {
+                        return commandGateway.send(new UserLogingEvent(user.getUserId(), true))
+                                .thenApply(success -> ResponseEntity.ok(user));
+                    } else {
+                        return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+                    }
+                })
+                .exceptionally(ex -> {
+                    ex.printStackTrace();
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                });*/
+        return commandGateway.send(new LoggingCommand(userId, false)).thenApply(success -> ResponseEntity.ok(success));
+    }
+
 
     public CompletableFuture<ResponseEntity<List<UserSummary>>> getUsers() {
         return queryGateway.query(new GetUsersQuery(), ResponseTypes.multipleInstancesOf(UserSummary.class))

@@ -1,10 +1,8 @@
 package com.example.Stars.service;
 
 import com.example.Stars.api.FollowUserCommand;
-import com.example.Stars.query.FollowSummaryRepository;
-import com.example.Stars.query.GetFollowsQuery;
-import com.example.Stars.query.GetStarsQuery;
-import com.example.Stars.query.UserSummaryRepository;
+import com.example.Stars.api.UnfollowUserCommand;
+import com.example.Stars.query.*;
 import com.example.Stars.read_model.FollowSummary;
 import com.example.Stars.read_model.StarSummary;
 import com.example.Stars.read_model.UserSummary;
@@ -37,18 +35,44 @@ public class FollowService {
     }
 
     public void handle(FollowSummary follow) throws Exception {
-        UserSummary u = userSummaryRepository.findByUsername(follow.getFollowee().getUsername()).orElseThrow(() -> new Exception("User not found"));
-        System.out.println(u.getUserId());
-        FollowUserCommand cmd = new FollowUserCommand(
-                UUID.randomUUID(),
-                follow.getFollower().getUserId(),
-                u.getUserId(),
-                LocalDateTime.now()
-        );
-        commandGateway.sendAndWait(cmd);
+        UserSummary u = queryGateway.query(new GetUserByUsernameQuery(follow.getFollowee().getUsername()),ResponseTypes.instanceOf(UserSummary.class)).join();
+
+        if(u!=null) {
+            System.out.println(u.getUserId());
+            FollowUserCommand cmd = new FollowUserCommand(
+                    UUID.randomUUID(),
+                    follow.getFollower().getUserId(),
+                    u.getUserId(),
+                    LocalDateTime.now(),
+                    true
+            );
+            commandGateway.sendAndWait(cmd);
+        }else{
+            throw new Exception("Error trying to follow user");
+        }
     }
 
+    public void unfollow(UUID followerId, String followeeUsername) throws Exception {
 
+        UserSummary followee = queryGateway.query(new GetUserByUsernameQuery(followeeUsername),ResponseTypes.instanceOf(UserSummary.class)).join();
+        FollowSummary follow = queryGateway.query(new GetFollowQuery(followerId, followee.getUserId()), ResponseTypes.instanceOf(FollowSummary.class)).join();
+
+
+        if(follow!=null
+                && follow.getFollowee().getUserId().equals(followee.getUserId())) {
+            //System.out.println(u.getUserId());
+            UnfollowUserCommand cmd = new UnfollowUserCommand(
+                    follow.getFollowId(),
+                    followerId,
+                    followee.getUserId(),
+                    LocalDateTime.now(),
+                    false
+            );
+            commandGateway.sendAndWait(cmd);
+        }else{
+            throw new Exception("Error trying to follow user");
+        }
+    }
 
     public CompletableFuture<ResponseEntity<List<FollowSummary>>> getFollows(){
         return queryGateway.query(new GetFollowsQuery(), ResponseTypes.multipleInstancesOf(FollowSummary.class))

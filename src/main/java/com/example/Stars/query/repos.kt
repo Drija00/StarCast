@@ -19,10 +19,25 @@ class GetUserForRegistrationQuery(
     val username: String? = null,
     val email: String? = null
 )
+class GetUserByUsernameQuery(
+    val username: String? = null,
+)
+
+class GetStarQuery(
+    val star_id: UUID? = null,
+)
 
 class GetStarsQuery
 class GetFollowsQuery
+class GetFollowQuery(
+    val follower_id: UUID? = null,
+    val followee_id: UUID? = null
+)
 class GetLikesQuery
+class GetLikeQuery(
+    val user_id: UUID? = null,
+    val star_id: UUID? = null,
+)
 
 interface UserSummaryRepository : JpaRepository <UserSummary, UUID>{
     fun findByUsername(username: String): Optional<UserSummary>
@@ -33,4 +48,9 @@ interface StarSummaryRepository : JpaRepository <StarSummary, UUID>{
     fun findByStarId(starId: UUID): Optional<StarSummary>
 }
 interface FollowSummaryRepository : JpaRepository <FollowSummary, UUID>
-interface LikeRepository : JpaRepository <LikeSummary, UUID>
+{
+    fun findByFollowerAndFollowee(follower: UserSummary, followee: UserSummary): Optional<FollowSummary>
+}
+interface LikeRepository : JpaRepository <LikeSummary, UUID>{
+    fun findByUserAndStar(user: UserSummary, star: StarSummary): Optional<LikeSummary>
+}

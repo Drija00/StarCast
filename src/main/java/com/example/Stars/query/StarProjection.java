@@ -30,15 +30,18 @@ public class StarProjection {
     }
 
     @QueryHandler
+    public StarSummary on(GetStarQuery gry){
+        return mStarSummaryRepository.findByStarId(gry.getStar_id()).orElse(null);
+    }
+
+    @QueryHandler
     public List<StarSummary> on(GetStarsQuery qry) {
         try {
             List<StarSummary> stars = mStarSummaryRepository.findAll();
             System.out.println(stars.toString());
             return stars;
         } catch (Exception e) {
-            // Log the exception for further inspection
             System.out.println(e.getMessage());
-            // Handle the exception, possibly returning an empty list or throwing a custom exception
             throw new RuntimeException("Failed to fetch stars", e);
         }
     }

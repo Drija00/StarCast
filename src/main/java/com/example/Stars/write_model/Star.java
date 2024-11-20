@@ -19,6 +19,7 @@ public class Star {
     private String content;
     private UUID user_id;
     private LocalDateTime timestamp;
+    private Boolean active;
 
     public Star() {
     }
@@ -30,7 +31,8 @@ public class Star {
                     cmd.getStarId(),
                     cmd.getContent(),
                     cmd.getUserId(),
-                    cmd.getTimestamp()
+                    cmd.getTimestamp(),
+                    cmd.getActive()
                 ));
     }
 
@@ -40,5 +42,6 @@ public class Star {
         this.content = event.getContent();
         this.user_id = event.getUserId();
         this.timestamp = event.getTimestamp();
+        this.active = event.getActive();
     }
 }

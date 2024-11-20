@@ -1,9 +1,7 @@
 package com.example.Stars.service;
 
 import com.example.Stars.api.PostStarCommand;
-import com.example.Stars.query.GetStarsQuery;
-import com.example.Stars.query.StarSummaryRepository;
-import com.example.Stars.query.UserSummaryRepository;
+import com.example.Stars.query.*;
 import com.example.Stars.read_model.StarSummary;
 import com.example.Stars.read_model.UserSummary;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -34,15 +32,21 @@ public class StarService {
     }
 
     public void handle(StarSummary star) throws Exception {
-        UserSummary u = userSummaryRepository.findByUsername(star.getUser().getUsername()).orElseThrow(() -> new Exception("User not found"));
+        UserSummary u = queryGateway.query(new GetUserByUsernameQuery(star.getUser().getUsername()), ResponseTypes.instanceOf(UserSummary.class)).join();
 
-        PostStarCommand cmd = new PostStarCommand(
-                UUID.randomUUID(),
-                star.getContent(),
-                u.getUserId(),
-                LocalDateTime.now()
-        );
-        commandGateway.send(cmd);
+        if(u!=null) {
+            PostStarCommand cmd = new PostStarCommand(
+                    UUID.randomUUID(),
+                    star.getContent(),
+                    u.getUserId(),
+                    LocalDateTime.now(),
+                    true
+            );
+            commandGateway.send(cmd);
+        } else {
+          throw new Exception("Error while posting star");
+        }
+
     }
 
     public CompletableFuture<ResponseEntity<List<StarSummary>>> getStars() {

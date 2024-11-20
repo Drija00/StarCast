@@ -1,7 +1,9 @@
 package com.example.Stars.write_model;
 
 import com.example.Stars.api.FollowUserCommand;
+import com.example.Stars.api.UnfollowUserCommand;
 import com.example.Stars.api.UserFollowedEvent;
+import com.example.Stars.api.UserUnfollowedEvent;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -18,6 +20,7 @@ public class Follow {
     private UUID followerId;
     private UUID followeeId;
     private LocalDateTime timestamp;
+    private boolean active;
 
     public Follow() {
     }
@@ -29,9 +32,32 @@ public class Follow {
                     command.getFollowId(),
                     command.getFollowerId(),
                     command.getFolloweeId(),
-                    command.getTimestamp()
+                    command.getTimestamp(),
+                    command.getActive()
                 )
         );
+    }
+
+    @CommandHandler
+    public void handle(UnfollowUserCommand cmd) {
+        AggregateLifecycle.apply(
+                new UserUnfollowedEvent(
+                        cmd.getFollowId(),
+                        cmd.getFollowerId(),
+                        cmd.getFolloweeId(),
+                        cmd.getTimestamp(),
+                        cmd.getActive()
+                )
+        );
+    }
+
+    @EventSourcingHandler
+    public void on(UserUnfollowedEvent event) {
+        this.followId = event.getFollowId();
+        this.followerId = event.getFollowerId();
+        this.followeeId = event.getFolloweeId();
+        this.timestamp = event.getTimestamp();
+        this.active = event.getActive();
     }
 
     @EventSourcingHandler
@@ -40,6 +66,7 @@ public class Follow {
         this.followerId = event.getFollowerId();
         this.followeeId = event.getFolloweeId();
         this.timestamp = event.getTimestamp();
+        this.active = event.getActive();
     }
 
 }

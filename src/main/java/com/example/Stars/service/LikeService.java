@@ -1,6 +1,7 @@
 package com.example.Stars.service;
 
 import com.example.Stars.api.LikeStarCommand;
+import com.example.Stars.api.UnlikeStarCommand;
 import com.example.Stars.query.*;
 import com.example.Stars.read_model.FollowSummary;
 import com.example.Stars.read_model.LikeSummary;
@@ -29,7 +30,7 @@ public class LikeService {
     private UserSummaryRepository userSummaryRepository;
     private StarSummaryRepository starSummaryRepository;
 
-    public LikeService(CommandGateway commandGateway, QueryGateway queryGateway, LikeRepository likeRepository, UserSummaryRepository userSummaryRepository, StarSummaryRepository starSummaryRepository, Like like) {
+    public LikeService(CommandGateway commandGateway, QueryGateway queryGateway, LikeRepository likeRepository, UserSummaryRepository userSummaryRepository, StarSummaryRepository starSummaryRepository) {
         this.commandGateway = commandGateway;
         this.queryGateway = queryGateway;
         this.likeRepository = likeRepository;
@@ -37,17 +38,40 @@ public class LikeService {
         this.starSummaryRepository = starSummaryRepository;
     }
 
-    public void handle(LikeSummary likeSummary){
-        UserSummary u = userSummaryRepository.findByUsername(likeSummary.getUser().getUsername()).orElseThrow(() -> new RuntimeException("User not found"));
-        StarSummary s = starSummaryRepository.findByStarId(likeSummary.getStar().getStarId()).orElseThrow(() -> new RuntimeException("Star not found"));
+    public void handle(UUID userId, UUID starId) throws Exception {
+        //UserSummary u = queryGateway.query(new GetUserQuery(likeSummary.getUser().getUsername()), ResponseTypes.instanceOf(UserSummary.class)).join();
+        StarSummary s = queryGateway.query(new GetStarQuery(starId), ResponseTypes.instanceOf(StarSummary.class)).join();
 
-        LikeStarCommand cmd = new LikeStarCommand(
-                UUID.randomUUID(),
-                u.getUserId(),
-                s.getStarId(),
-                LocalDateTime.now()
-        );
-        commandGateway.send(cmd);
+        if(s!=null){
+            LikeStarCommand cmd = new LikeStarCommand(
+                    UUID.randomUUID(),
+                    userId,
+                    s.getStarId(),
+                    LocalDateTime.now(),
+                    true
+            );
+            commandGateway.send(cmd);
+        }else{
+            throw new Exception("Error trying to like a star");
+        }
+    }
+
+    public void unlike(UUID userId, UUID starId) throws Exception {
+        StarSummary s = queryGateway.query(new GetStarQuery(starId), ResponseTypes.instanceOf(StarSummary.class)).join();
+        LikeSummary l = queryGateway.query(new GetLikeQuery(userId,starId), ResponseTypes.instanceOf(LikeSummary.class)).join();
+
+        if(l!=null && s!=null && l.getStar().getStarId().equals(s.getStarId()) && l.getUser().getUserId().equals(userId)){
+            UnlikeStarCommand cmd = new UnlikeStarCommand(
+                    l.getLikeId(),
+                    l.getUser().getUserId(),
+                    l.getStar().getStarId(),
+                    LocalDateTime.now(),
+                    false
+            );
+            commandGateway.send(cmd);
+        }else{
+            throw new Exception("Error trying to like a star");
+        }
     }
 
     public CompletableFuture<ResponseEntity<List<LikeSummary>>> getLikes(){

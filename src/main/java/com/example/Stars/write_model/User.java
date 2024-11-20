@@ -1,8 +1,8 @@
 package com.example.Stars.write_model;
 
-import com.example.Stars.api.RegisterUserCommand;
-import com.example.Stars.api.UserRegisteredEvent;
+import com.example.Stars.api.*;
 import lombok.Getter;
+import lombok.Setter;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -15,6 +15,7 @@ import java.util.UUID;
 
 @Aggregate
 @Getter
+@Setter
 public class User {
 
     @AggregateIdentifier
@@ -42,11 +43,25 @@ public class User {
                 ));
     }
 
+    @CommandHandler
+    public void handle(LoggingCommand cmd) {
+        AggregateLifecycle.apply(
+          new UserLogingEvent(
+                  cmd.getUserId(),
+                  cmd.getActive()
+          )
+        );
+    }
+
     @EventSourcingHandler public void on(@NotNull UserRegisteredEvent event) {
         this.user_id = event.getUserId();
         this.username = event.getUsername();
         this.email = event.getEmail();
         this.password = event.getPassword();
+        this.active = event.getActive();
+    }
+
+    @EventSourcingHandler public void on(@NotNull UserLogingEvent event) {
         this.active = event.getActive();
     }
 }

@@ -35,9 +35,13 @@ public class UserController {
         }
     }
 
-    @GetMapping("/login")
-    public CompletableFuture<ResponseEntity<UserSummary>> login(@RequestParam String username, @RequestParam String password) {
+    @PutMapping("/login")
+    public CompletableFuture<ResponseEntity<?>> login(@RequestParam String username, @RequestParam String password) {
         return userService.login(username, password);
+    }
+    @PutMapping("/logout")
+    public CompletableFuture<ResponseEntity<?>> logout(@RequestParam UUID user_id) {
+        return userService.logout(user_id);
     }
 
     @GetMapping("/users")

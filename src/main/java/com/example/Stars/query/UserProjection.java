@@ -1,5 +1,6 @@
 package com.example.Stars.query;
 
+import com.example.Stars.api.UserLogingEvent;
 import com.example.Stars.api.UserRegisteredEvent;
 import com.example.Stars.read_model.UserSummary;
 import com.example.Stars.write_model.User;
@@ -32,6 +33,18 @@ private final UserSummaryRepository repository;
         );
         repository.save(user);
     }
+
+    @EventHandler
+    public void on(UserLogingEvent evt){
+        UserSummary user = repository.findById(evt.getUserId()).orElse(null);
+        if(user != null){
+            user.setActive(evt.getActive());
+            repository.save(user);
+        }else{
+            throw new RuntimeException("User not found");
+        }
+    }
+
     @QueryHandler
     public List<UserSummary> on(GetUsersQuery qry) {
         try {
@@ -39,9 +52,7 @@ private final UserSummaryRepository repository;
                 System.out.println(users.toArray());
                 return users;
         } catch (Exception e) {
-            // Log the exception for further inspection
             System.out.println(e.getMessage());
-            // Handle the exception, possibly returning an empty list or throwing a custom exception
             throw new RuntimeException("Failed to fetch users", e);
         }
     }
@@ -52,13 +63,16 @@ private final UserSummaryRepository repository;
     }
 
     @QueryHandler
+    public UserSummary on(GetUserByUsernameQuery qry){
+        return repository.findByUsername(qry.getUsername()).orElse(null);
+    }
+
+    @QueryHandler
     public UserSummary on(GetLoginUserQuery qry) {
         try {
             return repository.findByUsernameAndPassword(qry.getUsername(), qry.getPassword()).orElseThrow(() -> new RuntimeException("User not found"));
         } catch (Exception e) {
-            // Log the exception for further inspection
             System.out.println(e.getMessage());
-            // Handle the exception, possibly returning an empty list or throwing a custom exception
             throw new RuntimeException("Failed to fetch a user", e);
         }
     }

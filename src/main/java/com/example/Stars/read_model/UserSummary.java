@@ -3,7 +3,9 @@ package com.example.Stars.read_model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +15,8 @@ import java.util.UUID;
 @Data
 @Table(name = "Users")
 @NoArgsConstructor
+@Getter
+@Setter
 public class UserSummary {
 
     @Id
