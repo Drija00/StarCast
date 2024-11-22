@@ -14,7 +14,7 @@ data class UserUnfollowedEvent(val followId: UUID, val followerId: UUID, val fol
 
 data class StarPostedEvent(val starId: UUID, val content: String, val userId: UUID, val timestamp : LocalDateTime, val active: Boolean)
 data class StarUpdatedEvent(val starId: UUID, val content: String, val user: User, val timestamp : LocalDateTime)
-data class StarDeletedEvent(val starId: UUID, val timestamp : LocalDateTime, val active: Boolean)
+data class StarDeletedEvent(val starId: UUID, val active: Boolean)
 
 data class StarLikedEvent(val likeId: UUID, val userId: UUID, val starId: UUID, val timestamp : LocalDateTime, val active: Boolean)
 data class StarUnlikedEvent(val likeId: UUID, val userId: UUID,val starId: UUID, val timestamp : LocalDateTime, val active: Boolean)

@@ -1,6 +1,8 @@
 package com.example.Stars.query;
 
+import com.example.Stars.api.StarDeletedEvent;
 import com.example.Stars.api.StarPostedEvent;
+import com.example.Stars.api.StarUpdatedEvent;
 import com.example.Stars.read_model.StarSummary;
 import com.example.Stars.read_model.UserSummary;
 import org.axonframework.eventhandling.EventHandler;
@@ -24,6 +26,22 @@ public class StarProjection {
                 event.getStarId(),
                 event.getContent(),
                 new UserSummary(event.getUserId()),
+                event.getTimestamp()
+        );
+        mStarSummaryRepository.save(star);
+    }
+
+    @EventHandler
+    public void on(StarDeletedEvent event) {
+        mStarSummaryRepository.deleteById(event.getStarId());
+    }
+
+    @EventHandler
+    public void on(StarUpdatedEvent event) {
+        StarSummary star = new StarSummary(
+                event.getStarId(),
+                event.getContent(),
+                new UserSummary(event.getUser().getUser_id()),
                 event.getTimestamp()
         );
         mStarSummaryRepository.save(star);

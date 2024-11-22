@@ -1,9 +1,12 @@
 package com.example.Stars.service;
 
+import com.example.Stars.api.DeleteStarCommand;
 import com.example.Stars.api.PostStarCommand;
+import com.example.Stars.api.UpdateStarCommand;
 import com.example.Stars.query.*;
 import com.example.Stars.read_model.StarSummary;
 import com.example.Stars.read_model.UserSummary;
+import com.example.Stars.write_model.Star;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
@@ -47,6 +50,36 @@ public class StarService {
           throw new Exception("Error while posting star");
         }
 
+    }
+    public void deleteStar(UUID userId, UUID starId) throws Exception {
+        StarSummary s = queryGateway.query(new GetStarQuery(starId), ResponseTypes.instanceOf(StarSummary.class)).join();
+        if(s!=null && s.getUser().getUserId().equals(userId)) {
+            DeleteStarCommand cmd = new DeleteStarCommand(
+                    s.getStarId(),
+                    false
+            );
+            commandGateway.send(cmd);
+
+        } else {
+            throw new Exception("Error while deleting star");
+        }
+    }
+
+    public void updateStar(UUID userId,StarSummary star) throws Exception {
+        StarSummary s = queryGateway.query(new GetStarQuery(star.getStarId()), ResponseTypes.instanceOf(StarSummary.class)).join();
+
+        if(s!=null && s.getUser().getUserId().equals(userId)) {
+            UpdateStarCommand cmd = new UpdateStarCommand(
+                    s.getStarId(),
+                    star.getContent(),
+                    userId,
+                    LocalDateTime.now()
+            );
+            commandGateway.send(cmd);
+
+        } else {
+            throw new Exception("Error while updating star");
+        }
     }
 
     public CompletableFuture<ResponseEntity<List<StarSummary>>> getStars() {

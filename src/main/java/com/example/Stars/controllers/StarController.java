@@ -9,10 +9,7 @@ import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -45,5 +42,31 @@ public class StarController {
     @GetMapping("/stars")
     public CompletableFuture<ResponseEntity<List<StarSummary>>> getStars() {
         return starService.getStars();
+    }
+
+    @PutMapping("/star")
+    public void handle(@RequestParam UUID userId, @RequestBody StarSummary star) {
+        if(star != null && userId != null) {
+            try {
+                starService.updateStar(userId, star);
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Star not found");
+            }
+        }else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/star")
+    public void delete(@RequestParam UUID userId, @RequestParam UUID starId) {
+        if(starId != null && userId != null) {
+            try {
+                starService.deleteStar(userId, starId);
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Star not found");
+            }
+        }else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
     }
 }
