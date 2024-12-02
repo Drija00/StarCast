@@ -1,15 +1,13 @@
-package com.example.Stars.query;
+package com.example.Stars.queries.query;
 
-import com.example.Stars.api.UserLogingEvent;
-import com.example.Stars.api.UserRegisteredEvent;
-import com.example.Stars.read_model.UserSummary;
+import com.example.Stars.apis.api.UserLogingEvent;
+import com.example.Stars.apis.api.UserRegisteredEvent;
+import com.example.Stars.queries.read_model.UserSummary;
 import com.example.Stars.write_model.User;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.io.Console;
 import java.util.List;
 
 @Component
@@ -60,6 +58,11 @@ private final UserSummaryRepository repository;
     @QueryHandler
     public UserSummary on(GetUserForRegistrationQuery qry){
             return repository.findByUsernameOrEmail(qry.getUsername(), qry.getEmail()).orElse(null);
+    }
+
+    @QueryHandler
+    public UserSummary on(GetUserByIdQuery qry){
+        return repository.findById(qry.getUserId()).orElse(null);
     }
 
     @QueryHandler

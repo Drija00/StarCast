@@ -1,14 +1,10 @@
-package com.example.Stars.service;
+package com.example.Stars.apis.service;
 
-import com.example.Stars.api.LikeStarCommand;
-import com.example.Stars.api.UnlikeStarCommand;
-import com.example.Stars.query.*;
-import com.example.Stars.read_model.FollowSummary;
-import com.example.Stars.read_model.LikeSummary;
-import com.example.Stars.read_model.StarSummary;
-import com.example.Stars.read_model.UserSummary;
-import com.example.Stars.write_model.Like;
-import com.example.Stars.write_model.Star;
+import com.example.Stars.apis.api.LikeStarCommand;
+import com.example.Stars.apis.api.UnlikeStarCommand;
+import com.example.Stars.queries.query.*;
+import com.example.Stars.queries.read_model.LikeSummary;
+import com.example.Stars.queries.read_model.StarSummary;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
@@ -76,6 +72,12 @@ public class LikeService {
 
     public CompletableFuture<ResponseEntity<List<LikeSummary>>> getLikes(){
         return queryGateway.query(new GetLikesQuery(), ResponseTypes.multipleInstancesOf(LikeSummary.class))
+                .thenApply(likeSummaries -> ResponseEntity.ok(likeSummaries))
+                .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+    }
+
+    public CompletableFuture<ResponseEntity<List<LikeSummary>>> getStarLikes(UUID starid){
+        return queryGateway.query(new GetStarLikesQuery(starid), ResponseTypes.multipleInstancesOf(LikeSummary.class))
                 .thenApply(likeSummaries -> ResponseEntity.ok(likeSummaries))
                 .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }

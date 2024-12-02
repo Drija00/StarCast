@@ -1,4 +1,4 @@
-package com.example.Stars.api
+package com.example.Stars.apis.api
 
 import com.example.Stars.write_model.User
 import org.axonframework.modelling.command.TargetAggregateIdentifier

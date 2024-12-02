@@ -1,13 +1,11 @@
-package com.example.Stars.service;
+package com.example.Stars.apis.service;
 
-import com.example.Stars.api.FollowUserCommand;
-import com.example.Stars.api.UnfollowUserCommand;
-import com.example.Stars.query.*;
-import com.example.Stars.read_model.FollowSummary;
-import com.example.Stars.read_model.StarSummary;
-import com.example.Stars.read_model.UserSummary;
+import com.example.Stars.apis.api.FollowUserCommand;
+import com.example.Stars.apis.api.UnfollowUserCommand;
+import com.example.Stars.queries.query.*;
+import com.example.Stars.queries.read_model.FollowSummary;
+import com.example.Stars.queries.read_model.UserSummary;
 import org.axonframework.commandhandling.gateway.CommandGateway;
-import org.axonframework.messaging.responsetypes.ResponseType;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.http.HttpStatus;
@@ -27,21 +25,21 @@ public class FollowService {
     private FollowSummaryRepository followSummaryRepository;
     private UserSummaryRepository userSummaryRepository;
 
-    public FollowService(CommandGateway commandGateway, QueryGateway queryGateway, FollowSummaryRepository followSummaryRepository, com.example.Stars.query.UserSummaryRepository userSummaryRepository) {
+    public FollowService(CommandGateway commandGateway, QueryGateway queryGateway, FollowSummaryRepository followSummaryRepository, UserSummaryRepository userSummaryRepository) {
         this.commandGateway = commandGateway;
         this.queryGateway = queryGateway;
         this.followSummaryRepository = followSummaryRepository;
         this.userSummaryRepository = userSummaryRepository;
     }
 
-    public void handle(FollowSummary follow) throws Exception {
-        UserSummary u = queryGateway.query(new GetUserByUsernameQuery(follow.getFollowee().getUsername()),ResponseTypes.instanceOf(UserSummary.class)).join();
+    public void handle(UUID followerId, String followeeUsername) throws Exception {
+        UserSummary u = queryGateway.query(new GetUserByUsernameQuery(followeeUsername),ResponseTypes.instanceOf(UserSummary.class)).join();
 
         if(u!=null) {
             System.out.println(u.getUserId());
             FollowUserCommand cmd = new FollowUserCommand(
                     UUID.randomUUID(),
-                    follow.getFollower().getUserId(),
+                    followerId,
                     u.getUserId(),
                     LocalDateTime.now(),
                     true

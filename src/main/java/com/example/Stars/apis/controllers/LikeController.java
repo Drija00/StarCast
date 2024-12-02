@@ -1,8 +1,7 @@
-package com.example.Stars.controllers;
+package com.example.Stars.apis.controllers;
 
-import com.example.Stars.read_model.FollowSummary;
-import com.example.Stars.read_model.LikeSummary;
-import com.example.Stars.service.LikeService;
+import com.example.Stars.queries.read_model.LikeSummary;
+import com.example.Stars.apis.service.LikeService;
 import com.example.Stars.write_model.Like;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +50,11 @@ public class LikeController {
     @GetMapping("/likes")
     public CompletableFuture<ResponseEntity<List<LikeSummary>>> getLikes(){
         return likeService.getLikes();
+    }
+
+    @GetMapping("/star/likes")
+    public CompletableFuture<ResponseEntity<List<LikeSummary>>> getStarLikes(@RequestParam UUID starId){
+        return likeService.getStarLikes(starId);
     }
 
 }

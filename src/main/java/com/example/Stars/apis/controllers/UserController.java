@@ -1,13 +1,7 @@
-package com.example.Stars.controllers;
+package com.example.Stars.apis.controllers;
 
-import com.example.Stars.api.RegisterUserCommand;
-import com.example.Stars.query.GetUsersQuery;
-import com.example.Stars.read_model.UserSummary;
-import com.example.Stars.service.UserService;
-import com.example.Stars.write_model.User;
-import org.axonframework.commandhandling.gateway.CommandGateway;
-import org.axonframework.messaging.responsetypes.ResponseTypes;
-import org.axonframework.queryhandling.QueryGateway;
+import com.example.Stars.queries.read_model.UserSummary;
+import com.example.Stars.apis.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,11 +29,11 @@ public class UserController {
         }
     }
 
-    @PutMapping("/login")
+    @PutMapping("/user/login")
     public CompletableFuture<ResponseEntity<?>> login(@RequestParam String username, @RequestParam String password) {
         return userService.login(username, password);
     }
-    @PutMapping("/logout")
+    @PutMapping("/user/logout")
     public CompletableFuture<ResponseEntity<?>> logout(@RequestParam UUID user_id) {
         return userService.logout(user_id);
     }

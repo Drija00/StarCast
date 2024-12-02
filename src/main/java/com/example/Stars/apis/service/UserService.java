@@ -1,13 +1,9 @@
-package com.example.Stars.service;
+package com.example.Stars.apis.service;
 
-import com.example.Stars.api.LoggingCommand;
-import com.example.Stars.api.RegisterUserCommand;
-import com.example.Stars.api.UserLogingEvent;
-import com.example.Stars.query.GetLoginUserQuery;
-import com.example.Stars.query.GetUserForRegistrationQuery;
-import com.example.Stars.query.GetUsersQuery;
-import com.example.Stars.query.UserSummaryRepository;
-import com.example.Stars.read_model.UserSummary;
+import com.example.Stars.apis.api.LoggingCommand;
+import com.example.Stars.apis.api.RegisterUserCommand;
+import com.example.Stars.queries.query.*;
+import com.example.Stars.queries.read_model.UserSummary;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
@@ -56,7 +52,13 @@ public class UserService {
     public CompletableFuture<ResponseEntity<?>> login(String username, String password) {
         UserSummary u = queryGateway.query(new GetLoginUserQuery(username, password), ResponseTypes.instanceOf(UserSummary.class)).join();
         if (u != null) {
-            return commandGateway.send(new LoggingCommand(u.getUserId(),true)).thenApply(success -> ResponseEntity.ok(success));
+            return commandGateway.send(new LoggingCommand(u.getUserId(), true))
+                    // Query the updated entity after the command succeeds
+                    .thenCompose(result -> queryGateway.query(
+                            new GetUserByIdQuery(u.getUserId()),
+                            ResponseTypes.instanceOf(UserSummary.class)
+                    ))
+                    .thenApply(updatedUser -> ResponseEntity.ok(updatedUser));
         }
         return CompletableFuture.completedFuture(ResponseEntity.notFound().build());
     }

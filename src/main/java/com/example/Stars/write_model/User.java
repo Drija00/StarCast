@@ -1,6 +1,10 @@
 package com.example.Stars.write_model;
 
 import com.example.Stars.api.*;
+import com.example.Stars.apis.api.LoggingCommand;
+import com.example.Stars.apis.api.RegisterUserCommand;
+import com.example.Stars.apis.api.UserLogingEvent;
+import com.example.Stars.apis.api.UserRegisteredEvent;
 import lombok.Getter;
 import lombok.Setter;
 import org.axonframework.commandhandling.CommandHandler;
@@ -53,12 +57,14 @@ public class User {
         );
     }
 
-    @EventSourcingHandler public void on(@NotNull UserRegisteredEvent event) {
+    @EventSourcingHandler public User on(@NotNull UserRegisteredEvent event) {
         this.user_id = event.getUserId();
         this.username = event.getUsername();
         this.email = event.getEmail();
         this.password = event.getPassword();
         this.active = event.getActive();
+
+        return this;
     }
 
     @EventSourcingHandler public void on(@NotNull UserLogingEvent event) {

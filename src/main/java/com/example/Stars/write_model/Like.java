@@ -1,9 +1,9 @@
 package com.example.Stars.write_model;
 
-import com.example.Stars.api.LikeStarCommand;
-import com.example.Stars.api.StarLikedEvent;
-import com.example.Stars.api.StarUnlikedEvent;
-import com.example.Stars.api.UnlikeStarCommand;
+import com.example.Stars.apis.api.LikeStarCommand;
+import com.example.Stars.apis.api.StarLikedEvent;
+import com.example.Stars.apis.api.StarUnlikedEvent;
+import com.example.Stars.apis.api.UnlikeStarCommand;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;

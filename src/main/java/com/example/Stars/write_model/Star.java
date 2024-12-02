@@ -1,6 +1,7 @@
 package com.example.Stars.write_model;
 
 import com.example.Stars.api.*;
+import com.example.Stars.apis.api.*;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;

@@ -1,8 +1,7 @@
-package com.example.Stars.controllers;
+package com.example.Stars.apis.controllers;
 
-import com.example.Stars.read_model.FollowSummary;
-import com.example.Stars.read_model.StarSummary;
-import com.example.Stars.service.FollowService;
+import com.example.Stars.queries.read_model.FollowSummary;
+import com.example.Stars.apis.service.FollowService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,10 +21,10 @@ public class FollowController {
     }
 
     @PostMapping("/follow")
-    public void handle(@RequestBody FollowSummary followSummary) {
-        if(followSummary != null) {
+    public void handle(@RequestParam UUID followerId, @RequestParam String followeeUsername) {
+        if(followerId != null && followeeUsername != null) {
             try {
-                followService.handle(followSummary);
+                followService.handle(followerId, followeeUsername);
             } catch (Exception e) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
             }

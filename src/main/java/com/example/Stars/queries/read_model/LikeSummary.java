@@ -1,4 +1,4 @@
-package com.example.Stars.read_model;
+package com.example.Stars.queries.read_model;
 
 import jakarta.persistence.*;
 import lombok.Data;

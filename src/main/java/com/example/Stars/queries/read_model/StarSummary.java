@@ -1,9 +1,8 @@
-package com.example.Stars.read_model;
+package com.example.Stars.queries.read_model;
 
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.boot.context.properties.bind.Name;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

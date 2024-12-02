@@ -1,12 +1,10 @@
-package com.example.Stars.service;
+package com.example.Stars.apis.service;
 
-import com.example.Stars.api.DeleteStarCommand;
-import com.example.Stars.api.PostStarCommand;
-import com.example.Stars.api.UpdateStarCommand;
-import com.example.Stars.query.*;
-import com.example.Stars.read_model.StarSummary;
-import com.example.Stars.read_model.UserSummary;
-import com.example.Stars.write_model.Star;
+import com.example.Stars.apis.api.DeleteStarCommand;
+import com.example.Stars.apis.api.PostStarCommand;
+import com.example.Stars.apis.api.UpdateStarCommand;
+import com.example.Stars.queries.query.*;
+import com.example.Stars.queries.read_model.StarSummary;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
@@ -34,14 +32,14 @@ public class StarService {
         this.userSummaryRepository = userSummaryRepository;
     }
 
-    public void handle(StarSummary star) throws Exception {
-        UserSummary u = queryGateway.query(new GetUserByUsernameQuery(star.getUser().getUsername()), ResponseTypes.instanceOf(UserSummary.class)).join();
+    public void handle(UUID userId, String content) throws Exception {
+        //UserSummary u = queryGateway.query(new GetUserByUsernameQuery(star.getUser().getUsername()), ResponseTypes.instanceOf(UserSummary.class)).join();
 
-        if(u!=null) {
+        if(userId!=null && content != null) {
             PostStarCommand cmd = new PostStarCommand(
                     UUID.randomUUID(),
-                    star.getContent(),
-                    u.getUserId(),
+                    content,
+                    userId,
                     LocalDateTime.now(),
                     true
             );
@@ -87,4 +85,15 @@ public class StarService {
                 .thenApply(starSummaries -> ResponseEntity.ok(starSummaries))
                 .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
+    public CompletableFuture<ResponseEntity<List<StarSummary>>> getUserStars(UUID userId) {
+        return queryGateway.query(new GetUserStarsQuery(userId), ResponseTypes.multipleInstancesOf(StarSummary.class))
+                .thenApply(starSummaries -> ResponseEntity.ok(starSummaries))
+                .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+    }
+    public CompletableFuture<ResponseEntity<List<StarSummary>>> getUserForYouStars(UUID userId) {
+        return queryGateway.query(new GetUserForYouStarsQuery(userId), ResponseTypes.multipleInstancesOf(StarSummary.class))
+                .thenApply(starSummaries -> ResponseEntity.ok(starSummaries))
+                .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+    }
+
 }

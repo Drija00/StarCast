@@ -1,18 +1,12 @@
-package com.example.Stars.controllers;
+package com.example.Stars.apis.controllers;
 
-import com.example.Stars.api.PostStarCommand;
-import com.example.Stars.query.GetStarsQuery;
-import com.example.Stars.read_model.StarSummary;
-import com.example.Stars.service.StarService;
-import org.axonframework.commandhandling.gateway.CommandGateway;
-import org.axonframework.messaging.responsetypes.ResponseTypes;
-import org.axonframework.queryhandling.QueryGateway;
+import com.example.Stars.queries.read_model.StarSummary;
+import com.example.Stars.apis.service.StarService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -27,10 +21,10 @@ public class StarController {
     }
 
     @PostMapping("/star")
-    public void handle(@RequestBody StarSummary star) {
-        if(star != null) {
+    public void handle(@RequestParam UUID userID, @RequestBody String content) {
+        if(userID != null && content != null) {
             try {
-                starService.handle(star);
+                starService.handle(userID, content);
             } catch (Exception e) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
             }
@@ -42,6 +36,15 @@ public class StarController {
     @GetMapping("/stars")
     public CompletableFuture<ResponseEntity<List<StarSummary>>> getStars() {
         return starService.getStars();
+    }
+
+    @GetMapping("/user/stars")
+    public CompletableFuture<ResponseEntity<List<StarSummary>>> getUserStars(@RequestParam UUID userId) {
+        return starService.getUserStars(userId);
+    }
+    @GetMapping("/user/stars/foryou")
+    public CompletableFuture<ResponseEntity<List<StarSummary>>> getUserForYouStars(@RequestParam UUID userId) {
+        return starService.getUserForYouStars(userId);
     }
 
     @PutMapping("/star")

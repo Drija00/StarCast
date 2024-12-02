@@ -1,11 +1,9 @@
-package com.example.Stars.query;
+package com.example.Stars.queries.query;
 
-import com.example.Stars.api.UserFollowedEvent;
-import com.example.Stars.api.UserUnfollowedEvent;
-import com.example.Stars.read_model.FollowSummary;
-import com.example.Stars.read_model.UserSummary;
-import com.example.Stars.write_model.Follow;
-import org.axonframework.commandhandling.CommandHandler;
+import com.example.Stars.apis.api.UserFollowedEvent;
+import com.example.Stars.apis.api.UserUnfollowedEvent;
+import com.example.Stars.queries.read_model.FollowSummary;
+import com.example.Stars.queries.read_model.UserSummary;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.stereotype.Component;

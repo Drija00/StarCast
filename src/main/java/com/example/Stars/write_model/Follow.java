@@ -1,9 +1,9 @@
 package com.example.Stars.write_model;
 
-import com.example.Stars.api.FollowUserCommand;
-import com.example.Stars.api.UnfollowUserCommand;
-import com.example.Stars.api.UserFollowedEvent;
-import com.example.Stars.api.UserUnfollowedEvent;
+import com.example.Stars.apis.api.FollowUserCommand;
+import com.example.Stars.apis.api.UnfollowUserCommand;
+import com.example.Stars.apis.api.UserFollowedEvent;
+import com.example.Stars.apis.api.UserUnfollowedEvent;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
