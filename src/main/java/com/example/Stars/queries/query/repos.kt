@@ -70,6 +70,6 @@ interface FollowSummaryRepository : JpaRepository <FollowSummary, UUID>
     fun findByFollowerAndFollowee(follower: UserSummary, followee: UserSummary): Optional<FollowSummary>
 }
 interface LikeRepository : JpaRepository <LikeSummary, UUID>{
-    fun findByUserAndStar(user: UserSummary, star: StarSummary): Optional<List<LikeSummary>>
+    fun findByUserAndStar(user: UserSummary, star: StarSummary): Optional<LikeSummary>
     fun findAllByStar(star: StarSummary): Optional<List<LikeSummary>>
 }

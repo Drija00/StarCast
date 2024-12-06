@@ -1,7 +1,5 @@
-package com.example.Stars.queries.read_model;
+package com.example.Stars.DTOs;
 
-import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,32 +7,23 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
-@Data
-@Table(name = "Stars")
 @NoArgsConstructor
 @Getter
 @Setter
-public class StarSummary {
-    @Id
-    @Column(name = "star_id")
+public class StarDTO {
     private UUID starId;
 
-    @Column(nullable = false)
     private String content;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserSummary user;
+    private UserDTO user;
 
-    @Column(nullable = false)
     private LocalDateTime timestamp;
 
-    public StarSummary(UUID starId) {
+    public StarDTO(UUID starId) {
         this.starId = starId;
     }
 
-    public StarSummary(UUID starId, String content, UserSummary user, LocalDateTime timestamp) {
+    public StarDTO(UUID starId, String content, UserDTO user, LocalDateTime timestamp) {
         this.starId = starId;
         this.content = content;
         this.user = user;
@@ -43,7 +32,7 @@ public class StarSummary {
 
     @Override
     public String toString() {
-        return "StarSummary{" +
+        return "StarDTO{" +
                 "starId=" + starId +
                 ", content='" + content + '\'' +
                 ", user=" + user +

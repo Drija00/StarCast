@@ -1,5 +1,7 @@
 package com.example.Stars.apis.service;
 
+import com.example.Stars.DTOs.FollowDTO;
+import com.example.Stars.DTOs.UserDTO;
 import com.example.Stars.apis.api.FollowUserCommand;
 import com.example.Stars.apis.api.UnfollowUserCommand;
 import com.example.Stars.queries.query.*;
@@ -33,7 +35,7 @@ public class FollowService {
     }
 
     public void handle(UUID followerId, String followeeUsername) throws Exception {
-        UserSummary u = queryGateway.query(new GetUserByUsernameQuery(followeeUsername),ResponseTypes.instanceOf(UserSummary.class)).join();
+        UserDTO u = queryGateway.query(new GetUserByUsernameQuery(followeeUsername),ResponseTypes.instanceOf(UserDTO.class)).join();
 
         if(u!=null) {
             System.out.println(u.getUserId());
@@ -52,8 +54,8 @@ public class FollowService {
 
     public void unfollow(UUID followerId, String followeeUsername) throws Exception {
 
-        UserSummary followee = queryGateway.query(new GetUserByUsernameQuery(followeeUsername),ResponseTypes.instanceOf(UserSummary.class)).join();
-        FollowSummary follow = queryGateway.query(new GetFollowQuery(followerId, followee.getUserId()), ResponseTypes.instanceOf(FollowSummary.class)).join();
+        UserDTO followee = queryGateway.query(new GetUserByUsernameQuery(followeeUsername),ResponseTypes.instanceOf(UserDTO.class)).join();
+        FollowDTO follow = queryGateway.query(new GetFollowQuery(followerId, followee.getUserId()), ResponseTypes.instanceOf(FollowDTO.class)).join();
 
 
         if(follow!=null
@@ -72,9 +74,9 @@ public class FollowService {
         }
     }
 
-    public CompletableFuture<ResponseEntity<List<FollowSummary>>> getFollows(){
-        return queryGateway.query(new GetFollowsQuery(), ResponseTypes.multipleInstancesOf(FollowSummary.class))
-                .thenApply(followSummaries -> ResponseEntity.ok(followSummaries))
+    public CompletableFuture<ResponseEntity<List<FollowDTO>>> getFollows(){
+        return queryGateway.query(new GetFollowsQuery(), ResponseTypes.multipleInstancesOf(FollowDTO.class))
+                .thenApply(follows -> ResponseEntity.ok(follows))
                 .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 }

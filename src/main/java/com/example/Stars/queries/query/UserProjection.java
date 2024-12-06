@@ -1,7 +1,9 @@
 package com.example.Stars.queries.query;
 
+import com.example.Stars.DTOs.UserDTO;
 import com.example.Stars.apis.api.UserLogingEvent;
 import com.example.Stars.apis.api.UserRegisteredEvent;
+import com.example.Stars.converter.impl.UserConverter;
 import com.example.Stars.queries.read_model.UserSummary;
 import com.example.Stars.write_model.User;
 import org.axonframework.eventhandling.EventHandler;
@@ -9,14 +11,17 @@ import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class UserProjection {
 private final UserSummaryRepository repository;
     private final User user;
+    private final UserConverter userConverter;
 
-    public UserProjection(UserSummaryRepository repository, User user) {this.repository = repository;
+    public UserProjection(UserSummaryRepository repository, User user, UserConverter userConverter) {this.repository = repository;
         this.user = user;
+        this.userConverter = userConverter;
     }
 
 
@@ -44,9 +49,10 @@ private final UserSummaryRepository repository;
     }
 
     @QueryHandler
-    public List<UserSummary> on(GetUsersQuery qry) {
+    public List<UserDTO> on(GetUsersQuery qry) {
         try {
-                List<UserSummary> users = repository.findAll();
+                List<UserDTO> users = repository.findAll().stream().map(entity -> userConverter.toDto(entity))
+                        .collect(Collectors.toList());;
                 System.out.println(users.toArray());
                 return users;
         } catch (Exception e) {
@@ -56,24 +62,28 @@ private final UserSummaryRepository repository;
     }
 
     @QueryHandler
-    public UserSummary on(GetUserForRegistrationQuery qry){
-            return repository.findByUsernameOrEmail(qry.getUsername(), qry.getEmail()).orElse(null);
+    public UserDTO on(GetUserForRegistrationQuery qry){
+            UserSummary us = repository.findByUsernameOrEmail(qry.getUsername(), qry.getEmail()).orElse(null);
+            return us!=null?userConverter.toDto(us):null;
     }
 
     @QueryHandler
-    public UserSummary on(GetUserByIdQuery qry){
-        return repository.findById(qry.getUserId()).orElse(null);
+    public UserDTO on(GetUserByIdQuery qry){
+        UserSummary us = repository.findById(qry.getUserId()).orElse(null);
+        return us!=null?userConverter.toDto(us):null;
     }
 
     @QueryHandler
-    public UserSummary on(GetUserByUsernameQuery qry){
-        return repository.findByUsername(qry.getUsername()).orElse(null);
+    public UserDTO on(GetUserByUsernameQuery qry){
+        UserSummary us = repository.findByUsername(qry.getUsername()).orElse(null);
+        return us!=null?userConverter.toDto(us):null;
     }
 
     @QueryHandler
-    public UserSummary on(GetLoginUserQuery qry) {
+    public UserDTO on(GetLoginUserQuery qry) {
         try {
-            return repository.findByUsernameAndPassword(qry.getUsername(), qry.getPassword()).orElseThrow(() -> new RuntimeException("User not found"));
+            UserSummary us = repository.findByUsernameAndPassword(qry.getUsername(), qry.getPassword()).orElseThrow(() -> new RuntimeException("User not found"));
+            return userConverter.toDto(us);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Failed to fetch a user", e);

@@ -1,5 +1,7 @@
 package com.example.Stars.apis.service;
 
+import com.example.Stars.DTOs.LikeDTO;
+import com.example.Stars.DTOs.StarDTO;
 import com.example.Stars.apis.api.LikeStarCommand;
 import com.example.Stars.apis.api.UnlikeStarCommand;
 import com.example.Stars.queries.query.*;
@@ -36,7 +38,7 @@ public class LikeService {
 
     public void handle(UUID userId, UUID starId) throws Exception {
         //UserSummary u = queryGateway.query(new GetUserQuery(likeSummary.getUser().getUsername()), ResponseTypes.instanceOf(UserSummary.class)).join();
-        StarSummary s = queryGateway.query(new GetStarQuery(starId), ResponseTypes.instanceOf(StarSummary.class)).join();
+        StarDTO s = queryGateway.query(new GetStarQuery(starId), ResponseTypes.instanceOf(StarDTO.class)).join();
 
         if(s!=null){
             LikeStarCommand cmd = new LikeStarCommand(
@@ -53,8 +55,8 @@ public class LikeService {
     }
 
     public void unlike(UUID userId, UUID starId) throws Exception {
-        StarSummary s = queryGateway.query(new GetStarQuery(starId), ResponseTypes.instanceOf(StarSummary.class)).join();
-        LikeSummary l = queryGateway.query(new GetLikeQuery(userId,starId), ResponseTypes.instanceOf(LikeSummary.class)).join();
+        StarDTO s = queryGateway.query(new GetStarQuery(starId), ResponseTypes.instanceOf(StarDTO.class)).join();
+        LikeDTO l = queryGateway.query(new GetLikeQuery(userId,starId), ResponseTypes.instanceOf(LikeDTO.class)).join();
 
         if(l!=null && s!=null && l.getStar().getStarId().equals(s.getStarId()) && l.getUser().getUserId().equals(userId)){
             UnlikeStarCommand cmd = new UnlikeStarCommand(
@@ -66,19 +68,19 @@ public class LikeService {
             );
             commandGateway.send(cmd);
         }else{
-            throw new Exception("Error trying to like a star");
+            throw new Exception("Error trying to unlike a star");
         }
     }
 
-    public CompletableFuture<ResponseEntity<List<LikeSummary>>> getLikes(){
-        return queryGateway.query(new GetLikesQuery(), ResponseTypes.multipleInstancesOf(LikeSummary.class))
-                .thenApply(likeSummaries -> ResponseEntity.ok(likeSummaries))
+    public CompletableFuture<ResponseEntity<List<LikeDTO>>> getLikes(){
+        return queryGateway.query(new GetLikesQuery(), ResponseTypes.multipleInstancesOf(LikeDTO.class))
+                .thenApply(likes -> ResponseEntity.ok(likes))
                 .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 
-    public CompletableFuture<ResponseEntity<List<LikeSummary>>> getStarLikes(UUID starid){
-        return queryGateway.query(new GetStarLikesQuery(starid), ResponseTypes.multipleInstancesOf(LikeSummary.class))
-                .thenApply(likeSummaries -> ResponseEntity.ok(likeSummaries))
+    public CompletableFuture<ResponseEntity<List<LikeDTO>>> getStarLikes(UUID starid){
+        return queryGateway.query(new GetStarLikesQuery(starid), ResponseTypes.multipleInstancesOf(LikeDTO.class))
+                .thenApply(likes -> ResponseEntity.ok(likes))
                 .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 

@@ -1,7 +1,9 @@
 package com.example.Stars.queries.query;
 
+import com.example.Stars.DTOs.FollowDTO;
 import com.example.Stars.apis.api.UserFollowedEvent;
 import com.example.Stars.apis.api.UserUnfollowedEvent;
+import com.example.Stars.converter.impl.FollowConverter;
 import com.example.Stars.queries.read_model.FollowSummary;
 import com.example.Stars.queries.read_model.UserSummary;
 import org.axonframework.eventhandling.EventHandler;
@@ -9,13 +11,16 @@ import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class FollowProjection {
     private final FollowSummaryRepository mFollowSummaryRepository;
+    private final FollowConverter mFollowConverter;
 
-    public FollowProjection(FollowSummaryRepository mFollowSummaryRepository) {
+    public FollowProjection(FollowSummaryRepository mFollowSummaryRepository, FollowConverter mFollowConverter) {
         this.mFollowSummaryRepository = mFollowSummaryRepository;
+        this.mFollowConverter = mFollowConverter;
     }
 
     @EventHandler
@@ -35,12 +40,14 @@ public class FollowProjection {
     }
 
     @QueryHandler
-    public List<FollowSummary> getFollows(GetFollowsQuery query) {
-        return mFollowSummaryRepository.findAll();
+    public List<FollowDTO> getFollows(GetFollowsQuery query) {
+        return mFollowSummaryRepository.findAll().stream().map(entity -> mFollowConverter.toDto(entity))
+                .collect(Collectors.toList());
     }
 
     @QueryHandler
-    public FollowSummary getFollows(GetFollowQuery query) {
-        return mFollowSummaryRepository.findByFollowerAndFollowee(new UserSummary(query.getFollower_id()),new UserSummary(query.getFollowee_id())).orElseThrow(() -> new RuntimeException("Follow not found"));
+    public FollowDTO getFollows(GetFollowQuery query) {
+        FollowSummary fs = mFollowSummaryRepository.findByFollowerAndFollowee(new UserSummary(query.getFollower_id()),new UserSummary(query.getFollowee_id())).orElseThrow(() -> new RuntimeException("Follow not found"));
+        return mFollowConverter.toDto(fs);
     }
 }

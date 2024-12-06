@@ -1,5 +1,6 @@
 package com.example.Stars.apis.controllers;
 
+import com.example.Stars.DTOs.UserDTO;
 import com.example.Stars.queries.read_model.UserSummary;
 import com.example.Stars.apis.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public void handle(@RequestBody UserSummary user) {
+    public void handle(@RequestBody UserDTO user) {
         if(user != null) {
             userService.handle(user);
         }else{
@@ -39,7 +40,7 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public CompletableFuture<ResponseEntity<List<UserSummary>>> getUsers() {
+    public CompletableFuture<ResponseEntity<List<UserDTO>>> getUsers() {
         return userService.getUsers();
     }
 

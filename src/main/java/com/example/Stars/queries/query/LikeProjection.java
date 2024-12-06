@@ -1,7 +1,9 @@
 package com.example.Stars.queries.query;
 
+import com.example.Stars.DTOs.LikeDTO;
 import com.example.Stars.apis.api.StarLikedEvent;
 import com.example.Stars.apis.api.StarUnlikedEvent;
+import com.example.Stars.converter.impl.LikeConverter;
 import com.example.Stars.queries.read_model.LikeSummary;
 import com.example.Stars.queries.read_model.StarSummary;
 import com.example.Stars.queries.read_model.UserSummary;
@@ -10,14 +12,17 @@ import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class LikeProjection {
 
     private final LikeRepository mLikeRepository;
+    private final LikeConverter mLikeConverter;
 
-    public LikeProjection(LikeRepository mLikeRepository) {
+    public LikeProjection(LikeRepository mLikeRepository, LikeConverter mLikeConverter) {
         this.mLikeRepository = mLikeRepository;
+        this.mLikeConverter = mLikeConverter;
     }
 
     @EventHandler
@@ -37,17 +42,20 @@ public class LikeProjection {
     }
 
     @QueryHandler
-    public List<LikeSummary> getLikes(GetLikesQuery query) {
-        return mLikeRepository.findAll();
+    public List<LikeDTO> getLikes(GetLikesQuery query) {
+        return mLikeRepository.findAll().stream().map(entity -> mLikeConverter.toDto(entity))
+                .collect(Collectors.toList());
     }
 
     @QueryHandler
-    public List<LikeSummary> getLikeByUserAndStar(GetLikeQuery query) {
-        return mLikeRepository.findByUserAndStar(new UserSummary(query.getUser_id()),new StarSummary(query.getStar_id())).orElseThrow(() -> new RuntimeException("No such star"));
+    public LikeDTO getLikeByUserAndStar(GetLikeQuery query) {
+        LikeSummary ls = mLikeRepository.findByUserAndStar(new UserSummary(query.getUser_id()),new StarSummary(query.getStar_id())).orElseThrow(() -> new RuntimeException("No such star"));
+        return ls!=null?mLikeConverter.toDto(ls):null;
     }
 
     @QueryHandler
-    public List<LikeSummary> getLikesByStar(GetStarLikesQuery query) {
-        return mLikeRepository.findAllByStar(new StarSummary(query.getStar_id())).orElseThrow(() -> new RuntimeException("No such star"));
+    public List<LikeDTO> getLikesByStar(GetStarLikesQuery query) {
+        return mLikeRepository.findAllByStar(new StarSummary(query.getStar_id())).orElseThrow(() -> new RuntimeException("No such star")).stream().map(entity -> mLikeConverter.toDto(entity))
+                .collect(Collectors.toList());
     }
 }

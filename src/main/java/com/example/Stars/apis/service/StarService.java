@@ -1,5 +1,6 @@
 package com.example.Stars.apis.service;
 
+import com.example.Stars.DTOs.StarDTO;
 import com.example.Stars.apis.api.DeleteStarCommand;
 import com.example.Stars.apis.api.PostStarCommand;
 import com.example.Stars.apis.api.UpdateStarCommand;
@@ -50,7 +51,7 @@ public class StarService {
 
     }
     public void deleteStar(UUID userId, UUID starId) throws Exception {
-        StarSummary s = queryGateway.query(new GetStarQuery(starId), ResponseTypes.instanceOf(StarSummary.class)).join();
+        StarDTO s = queryGateway.query(new GetStarQuery(starId), ResponseTypes.instanceOf(StarDTO.class)).join();
         if(s!=null && s.getUser().getUserId().equals(userId)) {
             DeleteStarCommand cmd = new DeleteStarCommand(
                     s.getStarId(),
@@ -63,8 +64,8 @@ public class StarService {
         }
     }
 
-    public void updateStar(UUID userId,StarSummary star) throws Exception {
-        StarSummary s = queryGateway.query(new GetStarQuery(star.getStarId()), ResponseTypes.instanceOf(StarSummary.class)).join();
+    public void updateStar(UUID userId,StarDTO star) throws Exception {
+        StarDTO s = queryGateway.query(new GetStarQuery(star.getStarId()), ResponseTypes.instanceOf(StarDTO.class)).join();
 
         if(s!=null && s.getUser().getUserId().equals(userId)) {
             UpdateStarCommand cmd = new UpdateStarCommand(
@@ -80,19 +81,19 @@ public class StarService {
         }
     }
 
-    public CompletableFuture<ResponseEntity<List<StarSummary>>> getStars() {
-        return queryGateway.query(new GetStarsQuery(), ResponseTypes.multipleInstancesOf(StarSummary.class))
-                .thenApply(starSummaries -> ResponseEntity.ok(starSummaries))
+    public CompletableFuture<ResponseEntity<List<StarDTO>>> getStars() {
+        return queryGateway.query(new GetStarsQuery(), ResponseTypes.multipleInstancesOf(StarDTO.class))
+                .thenApply(stars -> ResponseEntity.ok(stars))
                 .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
-    public CompletableFuture<ResponseEntity<List<StarSummary>>> getUserStars(UUID userId) {
-        return queryGateway.query(new GetUserStarsQuery(userId), ResponseTypes.multipleInstancesOf(StarSummary.class))
-                .thenApply(starSummaries -> ResponseEntity.ok(starSummaries))
+    public CompletableFuture<ResponseEntity<List<StarDTO>>> getUserStars(UUID userId) {
+        return queryGateway.query(new GetUserStarsQuery(userId), ResponseTypes.multipleInstancesOf(StarDTO.class))
+                .thenApply(stars -> ResponseEntity.ok(stars))
                 .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
-    public CompletableFuture<ResponseEntity<List<StarSummary>>> getUserForYouStars(UUID userId) {
-        return queryGateway.query(new GetUserForYouStarsQuery(userId), ResponseTypes.multipleInstancesOf(StarSummary.class))
-                .thenApply(starSummaries -> ResponseEntity.ok(starSummaries))
+    public CompletableFuture<ResponseEntity<List<StarDTO>>> getUserForYouStars(UUID userId) {
+        return queryGateway.query(new GetUserForYouStarsQuery(userId), ResponseTypes.multipleInstancesOf(StarDTO.class))
+                .thenApply(stars -> ResponseEntity.ok(stars))
                 .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 

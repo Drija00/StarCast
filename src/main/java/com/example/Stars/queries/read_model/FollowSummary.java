@@ -2,7 +2,9 @@ package com.example.Stars.queries.read_model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -11,6 +13,8 @@ import java.util.UUID;
 @Data
 @Table(name = "Follows")
 @NoArgsConstructor
+@Getter
+@Setter
 public class FollowSummary {
 
     @Id

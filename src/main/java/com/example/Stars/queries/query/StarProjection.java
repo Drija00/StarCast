@@ -1,8 +1,10 @@
 package com.example.Stars.queries.query;
 
+import com.example.Stars.DTOs.StarDTO;
 import com.example.Stars.apis.api.StarDeletedEvent;
 import com.example.Stars.apis.api.StarPostedEvent;
 import com.example.Stars.apis.api.StarUpdatedEvent;
+import com.example.Stars.converter.impl.StarConverter;
 import com.example.Stars.queries.read_model.StarSummary;
 import com.example.Stars.queries.read_model.UserSummary;
 import org.axonframework.eventhandling.EventHandler;
@@ -10,13 +12,16 @@ import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class StarProjection {
     private final StarSummaryRepository mStarSummaryRepository;
+    private final StarConverter mStarConverter;
 
-    public StarProjection(StarSummaryRepository mStarSummaryRepository) {
+    public StarProjection(StarSummaryRepository mStarSummaryRepository, StarConverter mStarConverter) {
         this.mStarSummaryRepository = mStarSummaryRepository;
+        this.mStarConverter = mStarConverter;
     }
 
     @EventHandler
@@ -47,26 +52,28 @@ public class StarProjection {
     }
 
     @QueryHandler
-    public StarSummary on(GetStarQuery gry){
-        return mStarSummaryRepository.findByStarId(gry.getStar_id()).orElse(null);
+    public StarDTO on(GetStarQuery gry){
+        StarSummary ss = mStarSummaryRepository.findByStarId(gry.getStar_id()).orElse(null);
+        return ss!=null?mStarConverter.toDto(ss):null;
     }
 
     @QueryHandler
-    public List<StarSummary> on(GetUserStarsQuery gry){
-        return mStarSummaryRepository.findAllByUserOrderByTimestampDesc(new UserSummary(gry.getUserId())).orElse(null);
+    public List<StarDTO> on(GetUserStarsQuery gry){
+        return mStarSummaryRepository.findAllByUserOrderByTimestampDesc(new UserSummary(gry.getUserId())).orElse(null).stream().map(entity -> mStarConverter.toDto(entity))
+                .collect(Collectors.toList());
     }
 
     @QueryHandler
-    public List<StarSummary> on(GetUserForYouStarsQuery gry){
-        return mStarSummaryRepository.findAllStarsForUsersForYou(gry.getUserId()).orElse(null);
+    public List<StarDTO> on(GetUserForYouStarsQuery gry){
+        return mStarSummaryRepository.findAllStarsForUsersForYou(gry.getUserId()).orElse(null).stream().map(entity -> mStarConverter.toDto(entity))
+                .collect(Collectors.toList());
     }
 
     @QueryHandler
-    public List<StarSummary> on(GetStarsQuery qry) {
+    public List<StarDTO> on(GetStarsQuery qry) {
         try {
-            List<StarSummary> stars = mStarSummaryRepository.findAll();
-            System.out.println(stars.toString());
-            return stars;
+            return mStarSummaryRepository.findAll().stream().map(entity -> mStarConverter.toDto(entity))
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Failed to fetch stars", e);

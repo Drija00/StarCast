@@ -1,5 +1,6 @@
 package com.example.Stars.apis.controllers;
 
+import com.example.Stars.DTOs.FollowDTO;
 import com.example.Stars.queries.read_model.FollowSummary;
 import com.example.Stars.apis.service.FollowService;
 import org.springframework.http.HttpStatus;
@@ -47,7 +48,7 @@ public class FollowController {
     }
 
     @GetMapping("/follows")
-    public CompletableFuture<ResponseEntity<List<FollowSummary>>> getFollows(){
+    public CompletableFuture<ResponseEntity<List<FollowDTO>>> getFollows(){
         return followService.getFollows();
     }
 }

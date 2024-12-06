@@ -1,5 +1,6 @@
 package com.example.Stars.apis.service;
 
+import com.example.Stars.DTOs.UserDTO;
 import com.example.Stars.apis.api.LoggingCommand;
 import com.example.Stars.apis.api.RegisterUserCommand;
 import com.example.Stars.queries.query.*;
@@ -28,9 +29,9 @@ public class UserService {
         this.userSummaryRepository = userSummaryRepository;
     }
 
-    public void handle(UserSummary user) {
+    public void handle(UserDTO user) {
 
-        UserSummary u = queryGateway.query(new GetUserForRegistrationQuery(user.getUsername(),user.getEmail()), ResponseTypes.instanceOf(UserSummary.class)).join();
+        UserDTO u = queryGateway.query(new GetUserForRegistrationQuery(user.getUsername(),user.getEmail()), ResponseTypes.instanceOf(UserDTO.class)).join();
 
         if (u == null) {
 
@@ -50,13 +51,12 @@ public class UserService {
 
 
     public CompletableFuture<ResponseEntity<?>> login(String username, String password) {
-        UserSummary u = queryGateway.query(new GetLoginUserQuery(username, password), ResponseTypes.instanceOf(UserSummary.class)).join();
+        UserDTO u = queryGateway.query(new GetLoginUserQuery(username, password), ResponseTypes.instanceOf(UserDTO.class)).join();
         if (u != null) {
             return commandGateway.send(new LoggingCommand(u.getUserId(), true))
-                    // Query the updated entity after the command succeeds
                     .thenCompose(result -> queryGateway.query(
                             new GetUserByIdQuery(u.getUserId()),
-                            ResponseTypes.instanceOf(UserSummary.class)
+                            ResponseTypes.instanceOf(UserDTO.class)
                     ))
                     .thenApply(updatedUser -> ResponseEntity.ok(updatedUser));
         }
@@ -81,9 +81,9 @@ public class UserService {
     }
 
 
-    public CompletableFuture<ResponseEntity<List<UserSummary>>> getUsers() {
-        return queryGateway.query(new GetUsersQuery(), ResponseTypes.multipleInstancesOf(UserSummary.class))
-                .thenApply(userSummaries -> ResponseEntity.ok(userSummaries))
+    public CompletableFuture<ResponseEntity<List<UserDTO>>> getUsers() {
+        return queryGateway.query(new GetUsersQuery(), ResponseTypes.multipleInstancesOf(UserDTO.class))
+                .thenApply(users -> ResponseEntity.ok(users))
                 .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 }

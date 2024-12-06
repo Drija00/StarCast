@@ -1,5 +1,6 @@
 package com.example.Stars.apis.controllers;
 
+import com.example.Stars.DTOs.LikeDTO;
 import com.example.Stars.queries.read_model.LikeSummary;
 import com.example.Stars.apis.service.LikeService;
 import com.example.Stars.write_model.Like;
@@ -48,12 +49,12 @@ public class LikeController {
     }
 
     @GetMapping("/likes")
-    public CompletableFuture<ResponseEntity<List<LikeSummary>>> getLikes(){
+    public CompletableFuture<ResponseEntity<List<LikeDTO>>> getLikes(){
         return likeService.getLikes();
     }
 
     @GetMapping("/star/likes")
-    public CompletableFuture<ResponseEntity<List<LikeSummary>>> getStarLikes(@RequestParam UUID starId){
+    public CompletableFuture<ResponseEntity<List<LikeDTO>>> getStarLikes(@RequestParam UUID starId){
         return likeService.getStarLikes(starId);
     }
 

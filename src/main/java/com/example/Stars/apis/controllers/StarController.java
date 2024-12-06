@@ -1,5 +1,6 @@
 package com.example.Stars.apis.controllers;
 
+import com.example.Stars.DTOs.StarDTO;
 import com.example.Stars.queries.read_model.StarSummary;
 import com.example.Stars.apis.service.StarService;
 import org.springframework.http.HttpStatus;
@@ -34,21 +35,21 @@ public class StarController {
     }
 
     @GetMapping("/stars")
-    public CompletableFuture<ResponseEntity<List<StarSummary>>> getStars() {
+    public CompletableFuture<ResponseEntity<List<StarDTO>>> getStars() {
         return starService.getStars();
     }
 
     @GetMapping("/user/stars")
-    public CompletableFuture<ResponseEntity<List<StarSummary>>> getUserStars(@RequestParam UUID userId) {
+    public CompletableFuture<ResponseEntity<List<StarDTO>>> getUserStars(@RequestParam UUID userId) {
         return starService.getUserStars(userId);
     }
     @GetMapping("/user/stars/foryou")
-    public CompletableFuture<ResponseEntity<List<StarSummary>>> getUserForYouStars(@RequestParam UUID userId) {
+    public CompletableFuture<ResponseEntity<List<StarDTO>>> getUserForYouStars(@RequestParam UUID userId) {
         return starService.getUserForYouStars(userId);
     }
 
     @PutMapping("/star")
-    public void handle(@RequestParam UUID userId, @RequestBody StarSummary star) {
+    public void handle(@RequestParam UUID userId, @RequestBody StarDTO star) {
         if(star != null && userId != null) {
             try {
                 starService.updateStar(userId, star);
