@@ -4,6 +4,7 @@ import com.example.Stars.DTOs.LikeDTO;
 import com.example.Stars.queries.read_model.LikeSummary;
 import com.example.Stars.apis.service.LikeService;
 import com.example.Stars.write_model.Like;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,18 +15,17 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
+@Profile("client")
 public class LikeController {
     private final LikeService likeService;
-    private final Like like;
 
-    public LikeController(LikeService likeService, Like like) {
+    public LikeController(LikeService likeService) {
         this.likeService = likeService;
-        this.like = like;
     }
 
     @PostMapping("/like")
     public void handle(@RequestParam UUID userId, @RequestParam UUID starId){
-        if(like != null) {
+        if(userId != null && starId != null) {
             try {
                 likeService.handle(userId,starId);
             } catch (Exception e) {

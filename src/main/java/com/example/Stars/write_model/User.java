@@ -13,10 +13,12 @@ import org.axonframework.modelling.command.AggregateLifecycle;
 
 import org.axonframework.spring.stereotype.Aggregate;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.context.annotation.Profile;
 
 import java.util.UUID;
 
 @Aggregate
+@Profile("write")
 @Getter
 @Setter
 public class User {

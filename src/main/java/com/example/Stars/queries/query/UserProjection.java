@@ -8,19 +8,20 @@ import com.example.Stars.queries.read_model.UserSummary;
 import com.example.Stars.write_model.User;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@Profile("query")
 public class UserProjection {
 private final UserSummaryRepository repository;
-    private final User user;
     private final UserConverter userConverter;
 
-    public UserProjection(UserSummaryRepository repository, User user, UserConverter userConverter) {this.repository = repository;
-        this.user = user;
+    public UserProjection(UserSummaryRepository repository, UserConverter userConverter) {
+        this.repository = repository;
         this.userConverter = userConverter;
     }
 

@@ -3,6 +3,7 @@ package com.example.Stars.apis.controllers;
 import com.example.Stars.DTOs.FollowDTO;
 import com.example.Stars.queries.read_model.FollowSummary;
 import com.example.Stars.apis.service.FollowService;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
+@Profile("client")
 public class FollowController {
 
     private final FollowService followService;

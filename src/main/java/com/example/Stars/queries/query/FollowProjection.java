@@ -8,12 +8,14 @@ import com.example.Stars.queries.read_model.FollowSummary;
 import com.example.Stars.queries.read_model.UserSummary;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@Profile("query")
 public class FollowProjection {
     private final FollowSummaryRepository mFollowSummaryRepository;
     private final FollowConverter mFollowConverter;
