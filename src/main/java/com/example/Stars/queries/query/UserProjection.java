@@ -6,6 +6,7 @@ import com.example.Stars.apis.api.UserRegisteredEvent;
 import com.example.Stars.converter.impl.UserConverter;
 import com.example.Stars.queries.read_model.UserSummary;
 import com.example.Stars.write_model.User;
+import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.context.annotation.Profile;
@@ -15,7 +16,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@Profile("query")
+@Profile("query_user")
+@ProcessingGroup("userProcessor")
 public class UserProjection {
 private final UserSummaryRepository repository;
     private final UserConverter userConverter;

@@ -36,10 +36,8 @@ public class UserSummary {
             name="follows",
             joinColumns = @JoinColumn(name = "follower_id"),
             inverseJoinColumns = @JoinColumn(name = "followee_id"))
-    @JsonIgnore
     private Set<UserSummary> following = new HashSet<>();
 
-    @JsonIgnore
     @ManyToMany(mappedBy = "following")
     private Set<UserSummary> followers = new HashSet<>();
 

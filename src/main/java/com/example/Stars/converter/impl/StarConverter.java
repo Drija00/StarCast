@@ -6,6 +6,8 @@ import com.example.Stars.queries.read_model.StarSummary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.stream.Collectors;
+
 @Component
 public class StarConverter implements DtoEntityConverter<StarDTO, StarSummary> {
 
@@ -14,7 +16,8 @@ public class StarConverter implements DtoEntityConverter<StarDTO, StarSummary> {
 
     @Override
     public StarDTO toDto(StarSummary starSummary) {
-        return new StarDTO(starSummary.getStarId(),starSummary.getContent(), userConverter.toDto(starSummary.getUser()),starSummary.getTimestamp());
+        return new StarDTO(starSummary.getStarId(),starSummary.getContent(), userConverter.toDto(starSummary.getUser()),starSummary.getTimestamp(),starSummary.getLikes().stream().map(entity -> userConverter.toDto(entity))
+                .collect(Collectors.toSet()));
     }
 
     @Override

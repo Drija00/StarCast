@@ -17,11 +17,11 @@ public class LikeConverter implements DtoEntityConverter<LikeDTO, LikeSummary> {
 
     @Override
     public LikeDTO toDto(LikeSummary likeSummary) {
-        return new LikeDTO(likeSummary.getLikeId(),userConverter.toDto(likeSummary.getUser()),starConverter.toDto(likeSummary.getStar()),likeSummary.getTimestamp());
+        return new LikeDTO(likeSummary.getLikeId(),userConverter.toDto(likeSummary.getUser()),starConverter.toDto(likeSummary.getStar()),likeSummary.getTimestamp(), likeSummary.isActive());
     }
 
     @Override
     public LikeSummary toEntity(LikeDTO likeDTO) {
-        return new LikeSummary(likeDTO.getLikeId(),userConverter.toEntity(likeDTO.getUser()),starConverter.toEntity(likeDTO.getStar()),likeDTO.getTimestamp());
+        return new LikeSummary(likeDTO.getLikeId(),userConverter.toEntity(likeDTO.getUser()),starConverter.toEntity(likeDTO.getStar()),likeDTO.getTimestamp(), likeDTO.isActive());
     }
 }

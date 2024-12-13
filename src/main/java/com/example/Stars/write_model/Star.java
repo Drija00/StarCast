@@ -2,6 +2,7 @@ package com.example.Stars.write_model;
 
 import com.example.Stars.apis.api.*;
 import org.axonframework.commandhandling.CommandHandler;
+import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
@@ -13,7 +14,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Aggregate
-@Profile("write")
+@Profile("write_star")
+@ProcessingGroup("starProcessor")
 public class Star {
     @AggregateIdentifier
     private UUID starId;

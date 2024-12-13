@@ -7,6 +7,7 @@ import com.example.Stars.converter.impl.LikeConverter;
 import com.example.Stars.queries.read_model.LikeSummary;
 import com.example.Stars.queries.read_model.StarSummary;
 import com.example.Stars.queries.read_model.UserSummary;
+import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.context.annotation.Profile;
@@ -16,7 +17,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@Profile("query")
+@Profile("query_like")
+@ProcessingGroup("likeProcessor")
 public class LikeProjection {
 
     private final LikeRepository mLikeRepository;
@@ -33,7 +35,8 @@ public class LikeProjection {
             event.getLikeId(),
             new UserSummary(event.getUserId()),
             new StarSummary(event.getStarId()),
-            event.getTimestamp()
+            event.getTimestamp(),
+            event.getActive()
         );
         mLikeRepository.save(like);
     }

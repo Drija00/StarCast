@@ -18,11 +18,13 @@ public class LikeDTO {
     private StarDTO star;
 
     private LocalDateTime timestamp;
+    private boolean active;
 
-    public LikeDTO(UUID likeId, UserDTO user, StarDTO star, LocalDateTime timestamp) {
+    public LikeDTO(UUID likeId, UserDTO user, StarDTO star, LocalDateTime timestamp, boolean active) {
         this.likeId = likeId;
         this.user = user;
         this.star = star;
         this.timestamp = timestamp;
+        this.active = active;
     }
 }

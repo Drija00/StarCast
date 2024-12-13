@@ -14,7 +14,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
-@Profile("client")
+@Profile("client_user")
 public class UserController {
 
     private final UserService userService;

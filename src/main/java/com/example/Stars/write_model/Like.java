@@ -5,6 +5,7 @@ import com.example.Stars.apis.api.StarLikedEvent;
 import com.example.Stars.apis.api.StarUnlikedEvent;
 import com.example.Stars.apis.api.UnlikeStarCommand;
 import org.axonframework.commandhandling.CommandHandler;
+import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
@@ -15,7 +16,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Aggregate
-@Profile("write")
+@Profile("write_like")
+@ProcessingGroup("likeProcessor")
 public class Like {
     @AggregateIdentifier
     private UUID likeId;

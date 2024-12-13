@@ -14,7 +14,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
-@Profile("client")
+@Profile("client_star")
 public class StarController {
 
     private final StarService starService;

@@ -7,6 +7,7 @@ import com.example.Stars.apis.api.UserRegisteredEvent;
 import lombok.Getter;
 import lombok.Setter;
 import org.axonframework.commandhandling.CommandHandler;
+import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
@@ -18,7 +19,8 @@ import org.springframework.context.annotation.Profile;
 import java.util.UUID;
 
 @Aggregate
-@Profile("write")
+@Profile("write_user")
+@ProcessingGroup("userProcessor")
 @Getter
 @Setter
 public class User {

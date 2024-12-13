@@ -6,6 +6,7 @@ import com.example.Stars.apis.api.UserUnfollowedEvent;
 import com.example.Stars.converter.impl.FollowConverter;
 import com.example.Stars.queries.read_model.FollowSummary;
 import com.example.Stars.queries.read_model.UserSummary;
+import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.context.annotation.Profile;
@@ -15,7 +16,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@Profile("query")
+@Profile("query_follow")
+@ProcessingGroup("followProcessor")
 public class FollowProjection {
     private final FollowSummaryRepository mFollowSummaryRepository;
     private final FollowConverter mFollowConverter;

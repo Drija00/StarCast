@@ -15,7 +15,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
-@Profile("client")
+@Profile("client_like")
 public class LikeController {
     private final LikeService likeService;
 

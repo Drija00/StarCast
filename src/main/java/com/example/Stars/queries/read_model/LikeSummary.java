@@ -31,10 +31,14 @@ public class LikeSummary {
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
-    public LikeSummary(UUID likeId, UserSummary user, StarSummary star, LocalDateTime timestamp) {
+    @Column(name = "active")
+    private boolean active;
+
+    public LikeSummary(UUID likeId, UserSummary user, StarSummary star, LocalDateTime timestamp, boolean active) {
         this.likeId = likeId;
         this.user = user;
         this.star = star;
         this.timestamp = timestamp;
+        this.active = active;
     }
 }

@@ -7,6 +7,7 @@ import com.example.Stars.apis.api.StarUpdatedEvent;
 import com.example.Stars.converter.impl.StarConverter;
 import com.example.Stars.queries.read_model.StarSummary;
 import com.example.Stars.queries.read_model.UserSummary;
+import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.context.annotation.Profile;
@@ -16,7 +17,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@Profile("query")
+@Profile("query_star")
+@ProcessingGroup("starProcessor")
 public class StarProjection {
     private final StarSummaryRepository mStarSummaryRepository;
     private final StarConverter mStarConverter;
