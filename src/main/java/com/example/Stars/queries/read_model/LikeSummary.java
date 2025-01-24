@@ -1,5 +1,6 @@
 package com.example.Stars.queries.read_model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -25,7 +26,7 @@ public class LikeSummary {
     private UserSummary user;
 
     @ManyToOne
-    @JoinColumn(name = "star_id",nullable = false)
+    @JoinColumn(name = "star_id", nullable = false)
     private StarSummary star;
 
     @Column(nullable = false)

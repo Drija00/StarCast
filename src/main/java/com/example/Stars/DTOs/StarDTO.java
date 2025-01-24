@@ -17,16 +17,16 @@ public class StarDTO {
 
     private String content;
 
-    private UserDTO user;
+    private UserFollowDTO user;
 
     private LocalDateTime timestamp;
-    private Set<UserDTO> userLikes;
+    private Set<UserFollowDTO> userLikes;
 
     public StarDTO(UUID starId) {
         this.starId = starId;
     }
 
-    public StarDTO(UUID starId, String content, UserDTO user, LocalDateTime timestamp, Set<UserDTO> userLikes) {
+    public StarDTO(UUID starId, String content, UserFollowDTO user, LocalDateTime timestamp, Set<UserFollowDTO> userLikes) {
         this.starId = starId;
         this.content = content;
         this.user = user;

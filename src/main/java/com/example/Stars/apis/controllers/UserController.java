@@ -1,6 +1,7 @@
 package com.example.Stars.apis.controllers;
 
 import com.example.Stars.DTOs.UserDTO;
+import com.example.Stars.DTOs.UserPostDTO;
 import com.example.Stars.queries.read_model.UserSummary;
 import com.example.Stars.apis.service.UserService;
 import org.springframework.context.annotation.Profile;
@@ -24,7 +25,7 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public void handle(@RequestBody UserDTO user) {
+    public void handle(@RequestBody UserPostDTO user) {
         if(user != null) {
             userService.handle(user);
         }else{
@@ -39,6 +40,20 @@ public class UserController {
     @PutMapping("/user/logout")
     public CompletableFuture<ResponseEntity<?>> logout(@RequestParam UUID user_id) {
         return userService.logout(user_id);
+    }
+    @PutMapping("/user/follow")
+    public CompletableFuture<ResponseEntity<?>> follow(@RequestParam UUID followerId, @RequestParam String followeeUsername) {
+        if(followerId != null && followeeUsername != null) {
+            try {
+                return userService.follow(followerId, followeeUsername);
+
+
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+            }
+        }else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/users")

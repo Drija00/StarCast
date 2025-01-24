@@ -11,11 +11,13 @@ import org.springframework.context.annotation.Profile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Aggregate
 @Profile("write_star")
-@ProcessingGroup("starProcessor")
+@ProcessingGroup("starProcessor1")
 public class Star {
     @AggregateIdentifier
     private UUID starId;
@@ -23,6 +25,9 @@ public class Star {
     private UUID user_id;
     private LocalDateTime timestamp;
     private Boolean active;
+
+    private Set<UUID> likes = new HashSet<>();
+    //private Set<UUID> followers = new HashSet<>();
 
     public Star() {
     }

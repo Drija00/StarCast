@@ -1,6 +1,5 @@
 package com.example.Stars.queries.query
 
-import com.example.Stars.queries.read_model.FollowSummary
 import com.example.Stars.queries.read_model.LikeSummary
 import com.example.Stars.queries.read_model.StarSummary
 import com.example.Stars.queries.read_model.UserSummary
@@ -58,17 +57,19 @@ interface UserSummaryRepository : JpaRepository <UserSummary, UUID>{
     fun findByUsernameOrEmail(username: String, email: String): Optional<UserSummary>
 }
 interface StarSummaryRepository : JpaRepository <StarSummary, UUID>{
+    @Query("SELECT s FROM StarSummary s LEFT JOIN FETCH s.likes")
+    override fun findAll(): List<StarSummary>
     fun findByStarId(starId: UUID): Optional<StarSummary>
-    @Query(
-        "SELECT s FROM StarSummary s JOIN s.user u where u in (SELECT f.followee from FollowSummary f where f.follower.userId=:userId) OR s.user.userId = :userId order by s.timestamp DESC "
-    )
-    fun findAllStarsForUsersForYou(userId: UUID): Optional<List<StarSummary>>
+//    @Query(
+//        "SELECT s FROM StarSummary s JOIN s.user u where u in (SELECT f.followee from FollowSummary f where f.follower.userId=:userId) OR s.user.userId = :userId order by s.timestamp DESC "
+//    )
+//    fun findAllStarsForUsersForYou(userId: UUID): Optional<List<StarSummary>>
     fun findAllByUserOrderByTimestampDesc(user: UserSummary): Optional<List<StarSummary>>
 }
-interface FollowSummaryRepository : JpaRepository <FollowSummary, UUID>
-{
-    fun findByFollowerAndFollowee(follower: UserSummary, followee: UserSummary): Optional<FollowSummary>
-}
+//interface FollowSummaryRepository : JpaRepository <FollowSummary, UUID>
+//{
+//    fun findByFollowerAndFollowee(follower: UserSummary, followee: UserSummary): Optional<FollowSummary>
+//}
 interface LikeRepository : JpaRepository <LikeSummary, UUID>{
     fun findByUserAndStar(user: UserSummary, star: StarSummary): Optional<LikeSummary>
     fun findAllByStar(star: StarSummary): Optional<List<LikeSummary>>

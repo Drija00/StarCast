@@ -7,8 +7,12 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
-data class RegisterUserCommand(@TargetAggregateIdentifier val userId: UUID, val username: String,val email: String, val password: String,val active: Boolean)
+data class RegisterUserCommand(@TargetAggregateIdentifier val userId: UUID, val username: String,val email: String, val password: String, val joinDate: LocalDateTime, val active: Boolean, val firstname: String, val lastname: String)
 data class LoggingCommand(@TargetAggregateIdentifier val userId: UUID, val active: Boolean)
+data class UserFollowedCommand(@TargetAggregateIdentifier val followerId: UUID, val followeeId: UUID)
+data class UserUnfollowedCommand(@TargetAggregateIdentifier val followerId: UUID, val followeeId: UUID)
+data class UserSetProfileImageCommand(@TargetAggregateIdentifier val userId: UUID, val profileImageUrl: String)
+data class UserSetBackgroundImageCommand(@TargetAggregateIdentifier val userId: UUID, val backgroundImage: String)
 
 
 data class FollowUserCommand(@TargetAggregateIdentifier val followId: UUID, val followerId: UUID, val followeeId: UUID, val timestamp : LocalDateTime, val active: Boolean)

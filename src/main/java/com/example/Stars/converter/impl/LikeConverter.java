@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class LikeConverter implements DtoEntityConverter<LikeDTO, LikeSummary> {
 
     @Autowired
-    private UserConverter userConverter;
+    private UserFollowConverter userConverter;
     @Autowired
     private StarConverter starConverter;
 

@@ -14,23 +14,28 @@ public class UserPostDTO {
     private String username;
     private String email;
     private String password;
+    private String firstName;
+    private String lastName;
     private boolean active = false;
 
-    public UserPostDTO(String username, String email, String password, boolean active) {
+    public UserPostDTO(String username, String email, String password, String firstName, String lastName, boolean active) {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.active = active;
     }
 
-
     @Override
     public String toString() {
-        return "UserDTO{" +
-                ", username='" + username + '\'' +
+        return "UserPostDTO{" +
+                "username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", active=" + active+
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", active=" + active +
                 '}';
     }
 }

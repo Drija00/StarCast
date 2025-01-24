@@ -9,27 +9,17 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
-@Data
-@Table(name = "Follows")
 @NoArgsConstructor
 @Getter
 @Setter
 public class FollowSummary {
 
-    @Id
-    @Column(name = "follow_id")
     private UUID followId;
 
-    @ManyToOne
-    @JoinColumn(name = "follower_id",nullable = false)
     private UserSummary follower;
 
-    @ManyToOne
-    @JoinColumn(name = "followee_id",nullable = false)
     private UserSummary followee;
 
-    @Column(nullable = false)
     private LocalDateTime timestamp;
 
     public FollowSummary(UUID followId, UserSummary follower, UserSummary followee, LocalDateTime timestamp) {

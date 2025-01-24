@@ -1,9 +1,6 @@
 package com.example.Stars.write_model;
 
-import com.example.Stars.apis.api.LoggingCommand;
-import com.example.Stars.apis.api.RegisterUserCommand;
-import com.example.Stars.apis.api.UserLogingEvent;
-import com.example.Stars.apis.api.UserRegisteredEvent;
+import com.example.Stars.apis.api.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.axonframework.commandhandling.CommandHandler;
@@ -16,11 +13,15 @@ import org.axonframework.spring.stereotype.Aggregate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Profile;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Aggregate
 @Profile("write_user")
-@ProcessingGroup("userProcessor")
+@ProcessingGroup("userProcessor2")
 @Getter
 @Setter
 public class User {
@@ -31,6 +32,14 @@ public class User {
     private String email;
     private String password;
     private boolean active;
+    private String firstName;
+    private String lastName;
+    private LocalDateTime joinDate;
+    private String profileImage;
+    private String backgroundImage;
+
+    private Set<UUID> following = new HashSet<>();
+    //private Set<UUID> followers = new HashSet<>();
 
     public User() {}
 
@@ -46,7 +55,10 @@ public class User {
                         command.getUsername(),
                         command.getEmail(),
                         command.getPassword(),
-                        command.getActive()
+                        command.getJoinDate(),
+                        command.getActive(),
+                        command.getFirstname(),
+                        command.getLastname()
                 ));
     }
 
@@ -56,6 +68,24 @@ public class User {
           new UserLogingEvent(
                   cmd.getUserId(),
                   cmd.getActive()
+          )
+        );
+    }
+    @CommandHandler
+    public void handle(UserSetProfileImageCommand cmd) {
+        AggregateLifecycle.apply(
+          new UserSetProfileImageEvent(
+                  cmd.getUserId(),
+                  cmd.getProfileImageUrl()
+          )
+        );
+    }
+    @CommandHandler
+    public void handle(UserSetBackgroundImageCommand cmd) {
+        AggregateLifecycle.apply(
+          new UserSetBackgroundImageEvent(
+                  cmd.getUserId(),
+                  cmd.getBackgroundImage()
           )
         );
     }
@@ -72,5 +102,51 @@ public class User {
 
     @EventSourcingHandler public void on(@NotNull UserLogingEvent event) {
         this.active = event.getActive();
+    }
+
+    @CommandHandler
+    public void handle(UserFollowedCommand command) {
+        if (!this.following.contains(command.getFolloweeId())) {
+            AggregateLifecycle.apply(new UserUserFollowedEvent(
+                    command.getFollowerId(),
+                    command.getFolloweeId()
+            ));
+        }
+    }
+
+    // Event handler for following a user
+    @EventSourcingHandler
+    public void on(@NotNull UserUserFollowedEvent event) {
+        this.user_id = event.getFollowerId();
+        this.following.add(event.getFolloweeId());
+    }// Event handler for following a user
+    @EventSourcingHandler
+    public void on(@NotNull UserSetBackgroundImageEvent event) {
+        this.user_id = event.getUserId();
+        this.backgroundImage= event.getBackgroundImage();
+    }// Event handler for following a user
+    @EventSourcingHandler
+    public void on(@NotNull UserSetProfileImageEvent event) {
+        this.user_id = event.getUserId();
+        this.profileImage= event.getProfileImageUrl();
+    }
+
+    // Command to unfollow a user
+    @CommandHandler
+    public void handle(UserUnfollowedCommand command) {
+        if (this.following.contains(command.getFolloweeId())) {
+            AggregateLifecycle.apply(new UserUserUnfollowedEvent(
+                    command.getFollowerId(),
+                    command.getFolloweeId()
+            ));
+        }
+    }
+
+    // Event handler for unfollowing a user
+    @EventSourcingHandler
+    public void on(@NotNull UserUserUnfollowedEvent event) {
+
+        this.user_id = event.getFollowerId();
+        this.following.remove(event.getFolloweeId());
     }
 }

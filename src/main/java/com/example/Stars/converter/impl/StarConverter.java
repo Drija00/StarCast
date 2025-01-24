@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 public class StarConverter implements DtoEntityConverter<StarDTO, StarSummary> {
 
     @Autowired
-    private UserConverter userConverter;
+    private UserFollowConverter userConverter;
 
     @Override
     public StarDTO toDto(StarSummary starSummary) {
-        return new StarDTO(starSummary.getStarId(),starSummary.getContent(), userConverter.toDto(starSummary.getUser()),starSummary.getTimestamp(),starSummary.getLikes().stream().map(entity -> userConverter.toDto(entity))
+        return new StarDTO(starSummary.getStarId(),starSummary.getContent(), userConverter.toDto(starSummary.getUser()),starSummary.getTimestamp(),starSummary.getLikes().stream().map(entity -> userConverter.toDto(entity.getUser()))
                 .collect(Collectors.toSet()));
     }
 

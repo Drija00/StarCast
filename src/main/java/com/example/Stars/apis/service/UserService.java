@@ -1,8 +1,9 @@
 package com.example.Stars.apis.service;
 
 import com.example.Stars.DTOs.UserDTO;
-import com.example.Stars.apis.api.LoggingCommand;
-import com.example.Stars.apis.api.RegisterUserCommand;
+import com.example.Stars.DTOs.UserFollowDTO;
+import com.example.Stars.DTOs.UserPostDTO;
+import com.example.Stars.apis.api.*;
 import com.example.Stars.queries.query.*;
 import com.example.Stars.queries.read_model.UserSummary;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -29,7 +31,7 @@ public class UserService {
         this.userSummaryRepository = userSummaryRepository;
     }
 
-    public void handle(UserDTO user) {
+    public void handle(UserPostDTO user) {
 
         UserDTO u = queryGateway.query(new GetUserForRegistrationQuery(user.getUsername(),user.getEmail()), ResponseTypes.instanceOf(UserDTO.class)).join();
 
@@ -40,7 +42,10 @@ public class UserService {
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
-                false
+                LocalDateTime.now(),
+                false,
+                user.getFirstName(),
+                user.getLastName()
         );
         commandGateway.sendAndWait(cmd);
         } else{
@@ -49,6 +54,82 @@ public class UserService {
 
     }
 
+    public CompletableFuture<ResponseEntity<?>> follow(UUID followerId, String followeeUsername) throws Exception {
+        UserDTO u = queryGateway.query(new GetUserByUsernameQuery(followeeUsername),ResponseTypes.instanceOf(UserDTO.class)).join();
+
+        if(u!=null) {
+            System.out.println(u.getUserId());
+
+            UserFollowedCommand cmd = new UserFollowedCommand(
+                    followerId,
+                    u.getUserId()
+            );
+            commandGateway.sendAndWait(cmd);
+
+//            FollowUserCommand cmd = new FollowUserCommand(
+//                    UUID.randomUUID(),
+//                    followerId,
+//                    u.getUserId(),
+//                    LocalDateTime.now(),
+//                    true
+//            );
+//            commandGateway.sendAndWait(cmd);
+        }else{
+            throw new Exception("Error trying to follow user");
+        }
+        return CompletableFuture.completedFuture(new ResponseEntity<>(HttpStatus.OK));
+    }
+
+    public CompletableFuture<ResponseEntity<?>> setProfileImage(UUID userID, String profileImage) throws Exception {
+        UserDTO u = queryGateway.query(new GetUserByIdQuery(userID),ResponseTypes.instanceOf(UserDTO.class)).join();
+
+        if(u!=null) {
+            System.out.println(u.getUserId());
+
+            UserSetProfileImageCommand cmd = new UserSetProfileImageCommand(
+                    u.getUserId(),
+                    profileImage
+            );
+            commandGateway.sendAndWait(cmd);
+
+//            FollowUserCommand cmd = new FollowUserCommand(
+//                    UUID.randomUUID(),
+//                    followerId,
+//                    u.getUserId(),
+//                    LocalDateTime.now(),
+//                    true
+//            );
+//            commandGateway.sendAndWait(cmd);
+        }else{
+            throw new Exception("Error trying to follow user");
+        }
+        return CompletableFuture.completedFuture(new ResponseEntity<>(HttpStatus.OK));
+    }
+    public CompletableFuture<ResponseEntity<?>> setBackgroundImage(UUID userID, String backgroundImage) throws Exception {
+        UserDTO u = queryGateway.query(new GetUserByIdQuery(userID),ResponseTypes.instanceOf(UserDTO.class)).join();
+
+        if(u!=null) {
+            System.out.println(u.getUserId());
+
+            UserSetBackgroundImageCommand cmd = new UserSetBackgroundImageCommand(
+                    u.getUserId(),
+                    backgroundImage
+            );
+            commandGateway.sendAndWait(cmd);
+
+//            FollowUserCommand cmd = new FollowUserCommand(
+//                    UUID.randomUUID(),
+//                    followerId,
+//                    u.getUserId(),
+//                    LocalDateTime.now(),
+//                    true
+//            );
+//            commandGateway.sendAndWait(cmd);
+        }else{
+            throw new Exception("Error trying to follow user");
+        }
+        return CompletableFuture.completedFuture(new ResponseEntity<>(HttpStatus.OK));
+    }
 
     public CompletableFuture<ResponseEntity<?>> login(String username, String password) {
         UserDTO u = queryGateway.query(new GetLoginUserQuery(username, password), ResponseTypes.instanceOf(UserDTO.class)).join();

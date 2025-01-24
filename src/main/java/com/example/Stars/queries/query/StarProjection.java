@@ -13,6 +13,7 @@ import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,10 +23,12 @@ import java.util.stream.Collectors;
 public class StarProjection {
     private final StarSummaryRepository mStarSummaryRepository;
     private final StarConverter mStarConverter;
+    private StarJavaRepo mStarJavaRepo;
 
-    public StarProjection(StarSummaryRepository mStarSummaryRepository, StarConverter mStarConverter) {
+    public StarProjection(StarSummaryRepository mStarSummaryRepository, StarConverter mStarConverter, StarJavaRepo mStarJavaRepo) {
         this.mStarSummaryRepository = mStarSummaryRepository;
         this.mStarConverter = mStarConverter;
+        this.mStarJavaRepo = mStarJavaRepo;
     }
 
     @EventHandler
@@ -69,15 +72,21 @@ public class StarProjection {
 
     @QueryHandler
     public List<StarDTO> on(GetUserForYouStarsQuery gry){
-        return mStarSummaryRepository.findAllStarsForUsersForYou(gry.getUserId()).orElse(null).stream().map(entity -> mStarConverter.toDto(entity))
-                .collect(Collectors.toList());
+//        return mStarSummaryRepository.findAllStarsForUsersForYou(gry.getUserId()).orElse(null).stream().map(entity -> mStarConverter.toDto(entity))
+//                .collect(Collectors.toList());
+        return null;
     }
 
     @QueryHandler
     public List<StarDTO> on(GetStarsQuery qry) {
         try {
-            return mStarSummaryRepository.findAll().stream().map(entity -> mStarConverter.toDto(entity))
-                    .collect(Collectors.toList());
+            List<StarSummary> stars = mStarSummaryRepository.findAll();
+            List<StarDTO> collect = new ArrayList<>();
+            for (StarSummary entity : stars) {
+                StarDTO dto = mStarConverter.toDto(entity);
+                collect.add(dto);
+            }
+            return collect;
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("Failed to fetch stars", e);

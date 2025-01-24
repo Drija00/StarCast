@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Aggregate
 @Profile("write_like")
-@ProcessingGroup("likeProcessor")
+@ProcessingGroup("likeProcessor1")
 public class Like {
     @AggregateIdentifier
     private UUID likeId;

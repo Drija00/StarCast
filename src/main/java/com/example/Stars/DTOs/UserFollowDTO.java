@@ -1,7 +1,6 @@
 package com.example.Stars.DTOs;
 
 import com.example.Stars.queries.read_model.UserSummary;
-import jakarta.persistence.ManyToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,8 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserDTO {
-
+public class UserFollowDTO {
     private UUID userId;
     private String username;
     private String email;
@@ -26,13 +24,12 @@ public class UserDTO {
     private LocalDateTime joinDate;
     private String profileImage;
     private String backgroundImage;
-    private Set<UserFollowDTO> following = new HashSet<>();
 
-    public UserDTO(UUID userId) {
+    public UserFollowDTO(UUID userId) {
         this.userId = userId;
     }
 
-    public UserDTO(UUID userId, String username, String email, String password, boolean active, String firstName, String lastName, LocalDateTime joinDate, String profileImage, String backgroundImage, Set<UserFollowDTO> following) {
+    public UserFollowDTO(UUID userId, String username, String email, String password, boolean active, String firstName, String lastName, LocalDateTime joinDate, String profileImage, String backgroundImage) {
         this.userId = userId;
         this.username = username;
         this.email = email;
@@ -43,12 +40,11 @@ public class UserDTO {
         this.joinDate = joinDate;
         this.profileImage = profileImage;
         this.backgroundImage = backgroundImage;
-        this.following = following;
     }
 
     @Override
     public String toString() {
-        return "UserDTO{" +
+        return "UserFollowDTO{" +
                 "userId=" + userId +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
@@ -59,7 +55,6 @@ public class UserDTO {
                 ", joinDate=" + joinDate +
                 ", profileImage='" + profileImage + '\'' +
                 ", backgroundImage='" + backgroundImage + '\'' +
-                ", following=" + following +
                 '}';
     }
 }

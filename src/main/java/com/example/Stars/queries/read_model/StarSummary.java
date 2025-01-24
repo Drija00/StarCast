@@ -1,5 +1,6 @@
 package com.example.Stars.queries.read_model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -7,9 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Data
@@ -32,13 +31,10 @@ public class StarSummary {
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "likes",
-            joinColumns = @JoinColumn(name = "star_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private Set<UserSummary> likes = new HashSet<UserSummary>();
+    @OneToMany(mappedBy = "star",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY)
+    private List<LikeSummary> likes = new ArrayList<>();
 
     public StarSummary(UUID starId) {
         this.starId = starId;

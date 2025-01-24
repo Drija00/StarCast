@@ -1,8 +1,7 @@
 package com.example.Stars.queries.query;
 
 import com.example.Stars.DTOs.UserDTO;
-import com.example.Stars.apis.api.UserLogingEvent;
-import com.example.Stars.apis.api.UserRegisteredEvent;
+import com.example.Stars.apis.api.*;
 import com.example.Stars.converter.impl.UserConverter;
 import com.example.Stars.queries.read_model.UserSummary;
 import com.example.Stars.write_model.User;
@@ -12,6 +11,7 @@ import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +35,12 @@ private final UserSummaryRepository repository;
                 event.getUsername(),
                 event.getEmail(),
                 event.getPassword(),
-                event.getActive()
+                event.getActive(),
+                event.getFirstname(),
+                event.getLastname(),
+                LocalDateTime.now(),
+                null,
+                null
         );
         repository.save(user);
     }
@@ -49,6 +54,39 @@ private final UserSummaryRepository repository;
         }else{
             throw new RuntimeException("User not found");
         }
+    }
+    @EventHandler
+    public void on(UserSetProfileImageEvent evt){
+        UserSummary user = repository.findById(evt.getUserId()).orElse(null);
+        if(user != null){
+            user.setProfileImage(evt.getProfileImageUrl());
+            repository.save(user);
+        }else{
+            throw new RuntimeException("User not found");
+        }
+    }
+    @EventHandler
+    public void on(UserSetBackgroundImageEvent evt){
+        UserSummary user = repository.findById(evt.getUserId()).orElse(null);
+        if(user != null){
+            user.setBackgroundImage(evt.getBackgroundImage());
+            repository.save(user);
+        }else{
+            throw new RuntimeException("User not found");
+        }
+    }
+
+    @EventHandler
+    public void on(UserUserFollowedEvent event) {
+        System.out.println("i");
+        UserSummary follower = repository.findById(event.getFollowerId())
+                .orElseThrow(() -> new IllegalArgumentException("Follower not found"));
+        UserSummary followee = repository.findById(event.getFolloweeId())
+                .orElseThrow(() -> new IllegalArgumentException("Followee not found"));
+
+        follower.getFollowing().add(followee);
+
+        repository.save(follower);
     }
 
     @QueryHandler

@@ -14,19 +14,18 @@ public class FollowDTO {
 
     private UUID followId;
 
-    private UserDTO follower;
+    private UserFollowDTO follower;
 
-    private UserDTO followee;
+    private UserFollowDTO followee;
 
     private LocalDateTime timestamp;
 
-    public FollowDTO(UUID followId, UserDTO follower, UserDTO followee, LocalDateTime timestamp) {
+    public FollowDTO(UUID followId, UserFollowDTO follower, UserFollowDTO followee, LocalDateTime timestamp) {
         this.followId = followId;
         this.follower = follower;
         this.followee = followee;
         this.timestamp = timestamp;
     }
-
 }
 
 
