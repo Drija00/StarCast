@@ -91,6 +91,8 @@ public class User {
     }
 
     @EventSourcingHandler public User on(@NotNull UserRegisteredEvent event) {
+
+        System.out.println("Event stored: " + event);
         this.user_id = event.getUserId();
         this.username = event.getUsername();
         this.email = event.getEmail();

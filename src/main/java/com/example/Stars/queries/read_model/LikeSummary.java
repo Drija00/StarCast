@@ -1,5 +1,6 @@
 package com.example.Stars.queries.read_model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -27,6 +28,7 @@ public class LikeSummary {
 
     @ManyToOne
     @JoinColumn(name = "star_id", nullable = false)
+    @JsonBackReference
     private StarSummary star;
 
     @Column(nullable = false)
@@ -42,4 +44,6 @@ public class LikeSummary {
         this.timestamp = timestamp;
         this.active = active;
     }
+
+
 }

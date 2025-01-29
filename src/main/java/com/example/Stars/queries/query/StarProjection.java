@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -24,20 +25,31 @@ public class StarProjection {
     private final StarSummaryRepository mStarSummaryRepository;
     private final StarConverter mStarConverter;
     private StarJavaRepo mStarJavaRepo;
+    private final UserSummaryRepository mUserSummaryRepository;
 
-    public StarProjection(StarSummaryRepository mStarSummaryRepository, StarConverter mStarConverter, StarJavaRepo mStarJavaRepo) {
+    public StarProjection(StarSummaryRepository mStarSummaryRepository, StarConverter mStarConverter, StarJavaRepo mStarJavaRepo, UserSummaryRepository mUserSummaryRepository) {
         this.mStarSummaryRepository = mStarSummaryRepository;
         this.mStarConverter = mStarConverter;
         this.mStarJavaRepo = mStarJavaRepo;
+        this.mUserSummaryRepository = mUserSummaryRepository;
     }
 
     @EventHandler
     public void on(StarPostedEvent event) {
+        Optional<UserSummary> user = mUserSummaryRepository.findById(event.getUserId());
+
+        if (user.isEmpty()) {
+            System.err.println("User not found for event: " + event.getStarId() + ". Skipping post.");
+            return;
+        }
+
         StarSummary star = new StarSummary(
                 event.getStarId(),
                 event.getContent(),
                 new UserSummary(event.getUserId()),
-                event.getTimestamp()
+                event.getTimestamp(),
+                null,
+                event.getImages()
         );
         mStarSummaryRepository.save(star);
     }
@@ -49,11 +61,14 @@ public class StarProjection {
 
     @EventHandler
     public void on(StarUpdatedEvent event) {
+        StarSummary s = mStarSummaryRepository.findByStarId(event.getStarId()).orElseThrow(() -> new RuntimeException("Star not found"));
         StarSummary star = new StarSummary(
                 event.getStarId(),
                 event.getContent(),
                 new UserSummary(event.getUser().getUser_id()),
-                event.getTimestamp()
+                event.getTimestamp(),
+                s.getLikes(),
+                s.getImages()
         );
         mStarSummaryRepository.save(star);
     }

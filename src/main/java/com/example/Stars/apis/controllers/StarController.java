@@ -1,6 +1,7 @@
 package com.example.Stars.apis.controllers;
 
 import com.example.Stars.DTOs.StarDTO;
+import com.example.Stars.DTOs.StarPostDTO;
 import com.example.Stars.queries.read_model.StarSummary;
 import com.example.Stars.apis.service.StarService;
 import org.springframework.context.annotation.Profile;
@@ -24,10 +25,10 @@ public class StarController {
     }
 
     @PostMapping("/star")
-    public void handle(@RequestParam UUID userID, @RequestBody String content) {
-        if(userID != null && content != null) {
+    public void handle(@RequestBody StarPostDTO starPostDTO) {
+        if(starPostDTO.getUser_id() != null && starPostDTO.getContent() != null) {
             try {
-                starService.handle(userID, content);
+                starService.handle(starPostDTO);
             } catch (Exception e) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
             }

@@ -11,9 +11,7 @@ import org.springframework.context.annotation.Profile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Aggregate
 @Profile("write_star")
@@ -27,6 +25,7 @@ public class Star {
     private Boolean active;
 
     private Set<UUID> likes = new HashSet<>();
+    private Set<String> images = new HashSet<>();
     //private Set<UUID> followers = new HashSet<>();
 
     public Star() {
@@ -40,8 +39,10 @@ public class Star {
                     cmd.getContent(),
                     cmd.getUserId(),
                     cmd.getTimestamp(),
-                    cmd.getActive()
+                    cmd.getActive(),
+                    cmd.getImages()
                 ));
+        System.out.println("Star created");
     }
 
     @CommandHandler
@@ -79,6 +80,7 @@ public class Star {
         this.user_id = event.getUserId();
         this.timestamp = event.getTimestamp();
         this.active = event.getActive();
+        this.images = event.getImages();
     }
 
     @EventSourcingHandler

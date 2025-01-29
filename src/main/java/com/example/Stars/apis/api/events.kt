@@ -16,7 +16,7 @@ data class UserSetBackgroundImageEvent(val userId: UUID, val backgroundImage: St
 data class UserFollowedEvent(val followId: UUID, val followerId: UUID, val followeeId: UUID, val timestamp : LocalDateTime, val active: Boolean)
 data class UserUnfollowedEvent(val followId: UUID, val followerId: UUID, val followeeId: UUID, val timestamp : LocalDateTime, val active: Boolean)
 
-data class StarPostedEvent(val starId: UUID, val content: String, val userId: UUID, val timestamp : LocalDateTime, val active: Boolean)
+data class StarPostedEvent(val starId: UUID, val content: String, val userId: UUID, val timestamp : LocalDateTime, val active: Boolean, val images: Set<String>)
 data class StarUpdatedEvent(val starId: UUID, val content: String, val user: User, val timestamp : LocalDateTime)
 data class StarDeletedEvent(val starId: UUID, val active: Boolean)
 

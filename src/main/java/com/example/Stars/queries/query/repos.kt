@@ -57,7 +57,7 @@ interface UserSummaryRepository : JpaRepository <UserSummary, UUID>{
     fun findByUsernameOrEmail(username: String, email: String): Optional<UserSummary>
 }
 interface StarSummaryRepository : JpaRepository <StarSummary, UUID>{
-    @Query("SELECT s FROM StarSummary s LEFT JOIN FETCH s.likes")
+    @Query("SELECT s FROM StarSummary s LEFT JOIN FETCH s.likes LEFT JOIN FETCH s.images")
     override fun findAll(): List<StarSummary>
     fun findByStarId(starId: UUID): Optional<StarSummary>
 //    @Query(

@@ -17,12 +17,12 @@ public class StarConverter implements DtoEntityConverter<StarDTO, StarSummary> {
     @Override
     public StarDTO toDto(StarSummary starSummary) {
         return new StarDTO(starSummary.getStarId(),starSummary.getContent(), userConverter.toDto(starSummary.getUser()),starSummary.getTimestamp(),starSummary.getLikes().stream().map(entity -> userConverter.toDto(entity.getUser()))
-                .collect(Collectors.toSet()));
+                .collect(Collectors.toSet()),starSummary.getImages());
     }
 
     @Override
     public StarSummary toEntity(StarDTO starDTO) {
-        return new StarSummary(starDTO.getStarId(),starDTO.getContent(),userConverter.toEntity(starDTO.getUser()),starDTO.getTimestamp());
+        return new StarSummary(starDTO.getStarId(),starDTO.getContent(),userConverter.toEntity(starDTO.getUser()),starDTO.getTimestamp(), null,starDTO.getImages());
     }
 
 }

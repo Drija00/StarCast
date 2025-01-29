@@ -1,5 +1,6 @@
 package com.example.Stars.DTOs;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class LikeDTO {
     private UUID likeId;
 
@@ -26,5 +28,16 @@ public class LikeDTO {
         this.star = star;
         this.timestamp = timestamp;
         this.active = active;
+    }
+
+    @Override
+    public String toString() {
+        return "LikeDTO{" +
+                "likeId=" + likeId +
+                ", user=" + user +
+                ", star=" + star +
+                ", timestamp=" + timestamp +
+                ", active=" + active +
+                '}';
     }
 }

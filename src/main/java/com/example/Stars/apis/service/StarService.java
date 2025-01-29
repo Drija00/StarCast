@@ -1,6 +1,7 @@
 package com.example.Stars.apis.service;
 
 import com.example.Stars.DTOs.StarDTO;
+import com.example.Stars.DTOs.StarPostDTO;
 import com.example.Stars.apis.api.DeleteStarCommand;
 import com.example.Stars.apis.api.PostStarCommand;
 import com.example.Stars.apis.api.UpdateStarCommand;
@@ -33,22 +34,21 @@ public class StarService {
         this.userSummaryRepository = userSummaryRepository;
     }
 
-    public void handle(UUID userId, String content) throws Exception {
+    public void handle(StarPostDTO starPostDTO) throws Exception {
         //UserSummary u = queryGateway.query(new GetUserByUsernameQuery(star.getUser().getUsername()), ResponseTypes.instanceOf(UserSummary.class)).join();
-
-        if(userId!=null && content != null) {
+            try{
             PostStarCommand cmd = new PostStarCommand(
                     UUID.randomUUID(),
-                    content,
-                    userId,
+                    starPostDTO.getContent(),
+                    starPostDTO.getUser_id(),
                     LocalDateTime.now(),
-                    true
+                    true,
+                    starPostDTO.getImages()
             );
             commandGateway.send(cmd);
-        } else {
-          throw new Exception("Error while posting star");
-        }
-
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
     }
     public void deleteStar(UUID userId, UUID starId) throws Exception {
         StarDTO s = queryGateway.query(new GetStarQuery(starId), ResponseTypes.instanceOf(StarDTO.class)).join();

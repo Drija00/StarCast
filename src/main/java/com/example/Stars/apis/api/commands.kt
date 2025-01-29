@@ -19,7 +19,7 @@ data class FollowUserCommand(@TargetAggregateIdentifier val followId: UUID, val 
 data class UnfollowUserCommand(@TargetAggregateIdentifier val followId: UUID, val followerId: UUID, val followeeId: UUID, val timestamp : LocalDateTime, val active: Boolean)
 
 
-data class PostStarCommand(@TargetAggregateIdentifier val starId: UUID, val content: String, val userId: UUID, val timestamp : LocalDateTime, val active: Boolean)
+data class PostStarCommand(@TargetAggregateIdentifier val starId: UUID, val content: String, val userId: UUID, val timestamp : LocalDateTime, val active: Boolean, val images: Set<String>)
 data class UpdateStarCommand(@TargetAggregateIdentifier val starId: UUID, val content: String, val userId: UUID, val timestamp : LocalDateTime)
 data class DeleteStarCommand(@TargetAggregateIdentifier val starId: UUID, val active: Boolean)
 

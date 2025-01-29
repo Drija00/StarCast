@@ -72,11 +72,19 @@ public class LikeService {
         }
     }
 
-    public CompletableFuture<ResponseEntity<List<LikeDTO>>> getLikes(){
+    public CompletableFuture<ResponseEntity<List<LikeDTO>>> getLikes() {
         return queryGateway.query(new GetLikesQuery(), ResponseTypes.multipleInstancesOf(LikeDTO.class))
-                .thenApply(likes -> ResponseEntity.ok(likes))
-                .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                .thenApply(likes -> {
+                    System.out.println("Service Layer: Likes received: " + likes);
+                    return ResponseEntity.ok(likes);
+                })
+                .exceptionally(ex -> {
+                    System.err.println("Service Layer: Exception - " + ex.getMessage());
+                    ex.printStackTrace();
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                });
     }
+
 
     public CompletableFuture<ResponseEntity<List<LikeDTO>>> getStarLikes(UUID starid){
         return queryGateway.query(new GetStarLikesQuery(starid), ResponseTypes.multipleInstancesOf(LikeDTO.class))

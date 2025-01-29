@@ -1,11 +1,14 @@
 package com.example.Stars.queries.read_model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -34,17 +37,25 @@ public class StarSummary {
     @OneToMany(mappedBy = "star",
             cascade = CascadeType.ALL,
             fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<LikeSummary> likes = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "star_images", joinColumns = @JoinColumn(name = "star_id"))
+    @Column(name = "image_path")
+    private Set<String> images;
 
     public StarSummary(UUID starId) {
         this.starId = starId;
     }
 
-    public StarSummary(UUID starId, String content, UserSummary user, LocalDateTime timestamp) {
+    public StarSummary(UUID starId, String content, UserSummary user, LocalDateTime timestamp, List<LikeSummary> likes, Set<String> images) {
         this.starId = starId;
         this.content = content;
         this.user = user;
         this.timestamp = timestamp;
+        this.likes = likes;
+        this.images = images;
     }
 
     @Override
@@ -54,6 +65,8 @@ public class StarSummary {
                 ", content='" + content + '\'' +
                 ", user=" + user +
                 ", timestamp=" + timestamp +
+                ", likes=" + likes +
+                ", images=" + images +
                 '}';
     }
 }
