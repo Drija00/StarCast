@@ -87,9 +87,8 @@ public class StarService {
     public CompletableFuture<ResponseEntity<PageResult<StarDTO>>> getStars(int offset, int limit) {
         return queryGateway.query(
                         new GetStarsQuery(offset, limit),
-                        ResponseTypes.instanceOf(PageResult.class))  // Ne koristimo generički tip ovde
+                        ResponseTypes.instanceOf(PageResult.class))
                 .thenApply(result -> {
-                    // Cast rezultat na PageResult<StarDTO>
                     PageResult<StarDTO> pageResult = (PageResult<StarDTO>) result;
                     return ResponseEntity.ok(pageResult);
                 })

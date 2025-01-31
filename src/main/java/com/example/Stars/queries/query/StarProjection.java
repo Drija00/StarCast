@@ -99,12 +99,12 @@ public class StarProjection {
     @QueryHandler
     public PageResult on(GetStarsQuery query) {
         int offset = query.getPageNumber() * query.getPageSize();
-        int limit = query.getPageSize(); // Definišemo limit
+        int limit = query.getPageSize();
 
-        Pageable pageable = PageRequest.of(offset, limit); // Popravljeno
+        Pageable pageable = PageRequest.of(offset, limit);
         List<StarSummary> items = mStarSummaryRepository.findAll(pageable).getContent();
         List<StarDTO> itemsDtos = items.stream().map(entity -> mStarConverter.toDto(entity)).collect(Collectors.toList());
-        long totalItems = mStarSummaryRepository.count(); // Ukupan broj zapisa
+        long totalItems = mStarSummaryRepository.count();
 
         return new PageResult<>(itemsDtos, totalItems);
     }
