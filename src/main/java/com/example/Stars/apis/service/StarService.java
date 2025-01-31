@@ -6,10 +6,13 @@ import com.example.Stars.apis.api.DeleteStarCommand;
 import com.example.Stars.apis.api.PostStarCommand;
 import com.example.Stars.apis.api.UpdateStarCommand;
 import com.example.Stars.queries.query.*;
+import com.example.Stars.queries.read_model.PageResult;
 import com.example.Stars.queries.read_model.StarSummary;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -81,11 +84,20 @@ public class StarService {
         }
     }
 
-    public CompletableFuture<ResponseEntity<List<StarDTO>>> getStars() {
-        return queryGateway.query(new GetStarsQuery(), ResponseTypes.multipleInstancesOf(StarDTO.class))
-                .thenApply(stars -> ResponseEntity.ok(stars))
+    public CompletableFuture<ResponseEntity<PageResult<StarDTO>>> getStars(int offset, int limit) {
+        return queryGateway.query(
+                        new GetStarsQuery(offset, limit),
+                        ResponseTypes.instanceOf(PageResult.class))  // Ne koristimo generički tip ovde
+                .thenApply(result -> {
+                    // Cast rezultat na PageResult<StarDTO>
+                    PageResult<StarDTO> pageResult = (PageResult<StarDTO>) result;
+                    return ResponseEntity.ok(pageResult);
+                })
                 .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
+
+
+
     public CompletableFuture<ResponseEntity<List<StarDTO>>> getUserStars(UUID userId) {
         return queryGateway.query(new GetUserStarsQuery(userId), ResponseTypes.multipleInstancesOf(StarDTO.class))
                 .thenApply(stars -> ResponseEntity.ok(stars))

@@ -2,9 +2,14 @@ package com.example.Stars.apis.controllers;
 
 import com.example.Stars.DTOs.StarDTO;
 import com.example.Stars.DTOs.StarPostDTO;
+import com.example.Stars.queries.read_model.PageResult;
 import com.example.Stars.queries.read_model.StarSummary;
 import com.example.Stars.apis.service.StarService;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,8 +43,8 @@ public class StarController {
     }
 
     @GetMapping("/stars")
-    public CompletableFuture<ResponseEntity<List<StarDTO>>> getStars() {
-        return starService.getStars();
+    public CompletableFuture<ResponseEntity<PageResult<StarDTO>>> getStars(int offset, int limit) {
+        return starService.getStars(offset, limit);
     }
 
     @GetMapping("/user/stars")

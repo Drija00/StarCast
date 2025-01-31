@@ -3,6 +3,8 @@ package com.example.Stars.queries.query
 import com.example.Stars.queries.read_model.LikeSummary
 import com.example.Stars.queries.read_model.StarSummary
 import com.example.Stars.queries.read_model.UserSummary
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import java.util.Optional
@@ -35,7 +37,11 @@ class GetUserForYouStarsQuery(
     val userId: UUID? = null,
 )
 
-class GetStarsQuery
+class GetStarsQuery(
+    val pageNumber: Int = 0,
+    val pageSize: Int = 12,
+)
+
 class GetFollowsQuery
 class GetFollowQuery(
     val follower_id: UUID? = null,
@@ -58,7 +64,7 @@ interface UserSummaryRepository : JpaRepository <UserSummary, UUID>{
 }
 interface StarSummaryRepository : JpaRepository <StarSummary, UUID>{
     @Query("SELECT s FROM StarSummary s LEFT JOIN FETCH s.likes LEFT JOIN FETCH s.images")
-    override fun findAll(): List<StarSummary>
+    override fun findAll(pageable: Pageable): Page<StarSummary>
     fun findByStarId(starId: UUID): Optional<StarSummary>
 //    @Query(
 //        "SELECT s FROM StarSummary s JOIN s.user u where u in (SELECT f.followee from FollowSummary f where f.follower.userId=:userId) OR s.user.userId = :userId order by s.timestamp DESC "

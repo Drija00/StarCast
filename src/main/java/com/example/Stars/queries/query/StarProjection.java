@@ -5,15 +5,19 @@ import com.example.Stars.apis.api.StarDeletedEvent;
 import com.example.Stars.apis.api.StarPostedEvent;
 import com.example.Stars.apis.api.StarUpdatedEvent;
 import com.example.Stars.converter.impl.StarConverter;
+import com.example.Stars.queries.read_model.PageResult;
 import com.example.Stars.queries.read_model.StarSummary;
 import com.example.Stars.queries.read_model.UserSummary;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -93,18 +97,16 @@ public class StarProjection {
     }
 
     @QueryHandler
-    public List<StarDTO> on(GetStarsQuery qry) {
-        try {
-            List<StarSummary> stars = mStarSummaryRepository.findAll();
-            List<StarDTO> collect = new ArrayList<>();
-            for (StarSummary entity : stars) {
-                StarDTO dto = mStarConverter.toDto(entity);
-                collect.add(dto);
-            }
-            return collect;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            throw new RuntimeException("Failed to fetch stars", e);
-        }
+    public PageResult on(GetStarsQuery query) {
+        int offset = query.getPageNumber() * query.getPageSize();
+        int limit = query.getPageSize(); // Definišemo limit
+
+        Pageable pageable = PageRequest.of(offset, limit); // Popravljeno
+        List<StarSummary> items = mStarSummaryRepository.findAll(pageable).getContent();
+        List<StarDTO> itemsDtos = items.stream().map(entity -> mStarConverter.toDto(entity)).collect(Collectors.toList());
+        long totalItems = mStarSummaryRepository.count(); // Ukupan broj zapisa
+
+        return new PageResult<>(itemsDtos, totalItems);
     }
+
 }

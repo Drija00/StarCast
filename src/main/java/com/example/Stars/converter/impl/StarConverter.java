@@ -25,4 +25,5 @@ public class StarConverter implements DtoEntityConverter<StarDTO, StarSummary> {
         return new StarSummary(starDTO.getStarId(),starDTO.getContent(),userConverter.toEntity(starDTO.getUser()),starDTO.getTimestamp(), null,starDTO.getImages());
     }
 
+
 }
