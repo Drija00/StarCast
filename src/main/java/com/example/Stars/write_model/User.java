@@ -35,6 +35,7 @@ public class User {
     private String firstName;
     private String lastName;
     private LocalDateTime joinDate;
+    private String description;
     private String profileImage;
     private String backgroundImage;
 
@@ -58,7 +59,8 @@ public class User {
                         command.getJoinDate(),
                         command.getActive(),
                         command.getFirstname(),
-                        command.getLastname()
+                        command.getLastname(),
+                        command.getDescription()
                 ));
     }
 

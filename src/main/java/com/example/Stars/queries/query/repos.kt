@@ -32,9 +32,13 @@ class GetStarQuery(
 )
 class GetUserStarsQuery(
     val userId: UUID? = null,
+    val pageNumber: Int = 0,
+    val pageSize: Int = 12,
 )
 class GetUserForYouStarsQuery(
     val userId: UUID? = null,
+    val pageNumber: Int = 0,
+    val pageSize: Int = 12,
 )
 
 class GetStarsQuery(
@@ -66,11 +70,19 @@ interface StarSummaryRepository : JpaRepository <StarSummary, UUID>{
     @Query("SELECT s FROM StarSummary s LEFT JOIN FETCH s.likes LEFT JOIN FETCH s.images")
     override fun findAll(pageable: Pageable): Page<StarSummary>
     fun findByStarId(starId: UUID): Optional<StarSummary>
-//    @Query(
-//        "SELECT s FROM StarSummary s JOIN s.user u where u in (SELECT f.followee from FollowSummary f where f.follower.userId=:userId) OR s.user.userId = :userId order by s.timestamp DESC "
-//    )
-//    fun findAllStarsForUsersForYou(userId: UUID): Optional<List<StarSummary>>
-    fun findAllByUserOrderByTimestampDesc(user: UserSummary): Optional<List<StarSummary>>
+    @Query(
+        "SELECT s FROM StarSummary s WHERE s.user IN ( SELECT f FROM UserSummary u JOIN u.following f WHERE u.userId = :userId) OR s.user.userId = :userId ORDER BY s.timestamp DESC"
+    )
+    fun findAllStarsForUsersForYou(userId: UUID, pageable: Pageable): Page<StarSummary>
+    @Query(
+        " SELECT COUNT(s) FROM StarSummary s WHERE s.user IN (SELECT f FROM UserSummary u JOIN u.following f WHERE u.userId = :userId) OR s.user.userId = :userId"
+    )
+    fun countStarsForUsersForYou(userId: UUID): Long
+
+    @Query("SELECT COUNT(s) FROM StarSummary s WHERE s.user.userId = :userId")
+    fun countStarsForUsers(userId: UUID): Long
+
+    fun findAllByUserOrderByTimestampDesc(user: UserSummary, pageable: Pageable): Page<StarSummary>
 }
 //interface FollowSummaryRepository : JpaRepository <FollowSummary, UUID>
 //{

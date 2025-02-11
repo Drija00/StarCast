@@ -6,9 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @NoArgsConstructor
 @Getter
@@ -21,14 +19,14 @@ public class StarDTO {
     private UserFollowDTO user;
 
     private LocalDateTime timestamp;
-    private Set<UserFollowDTO> userLikes;
-    private Set<String> images;
+    private Set<UserFollowDTO> userLikes = new HashSet<>();
+    private List<String> images = new ArrayList<>();
 
     public StarDTO(UUID starId) {
         this.starId = starId;
     }
 
-    public StarDTO(UUID starId, String content, UserFollowDTO user, LocalDateTime timestamp, Set<UserFollowDTO> userLikes, Set<String> images) {
+    public StarDTO(UUID starId, String content, UserFollowDTO user, LocalDateTime timestamp, Set<UserFollowDTO> userLikes, List<String> images) {
         this.starId = starId;
         this.content = content;
         this.user = user;

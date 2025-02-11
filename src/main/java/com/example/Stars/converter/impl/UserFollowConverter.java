@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 public class UserFollowConverter implements DtoEntityConverter<UserFollowDTO, UserSummary> {
     @Override
     public UserFollowDTO toDto(UserSummary userSummary) {
-        return new UserFollowDTO(userSummary.getUserId(),userSummary.getUsername(),userSummary.getEmail(), userSummary.getPassword(), userSummary.isActive(),userSummary.getFirstName(), userSummary.getLastName(),userSummary.getJoinDate(),userSummary.getProfileImage(),userSummary.getBackgroundImage());
+        return new UserFollowDTO(userSummary.getUserId(),userSummary.getUsername(),userSummary.getEmail(), userSummary.getPassword(), userSummary.isActive(),userSummary.getFirstName(), userSummary.getLastName(),userSummary.getJoinDate(),userSummary.getProfileImage(),userSummary.getBackgroundImage(), userSummary.getDescription());
     }
 
     @Override
     public UserSummary toEntity(UserFollowDTO userDTO) {
-        return new UserSummary(userDTO.getUserId(), userDTO.getUsername(), userDTO.getEmail(), userDTO.getPassword(), userDTO.isActive(), userDTO.getFirstName(), userDTO.getLastName(),userDTO.getJoinDate(),userDTO.getProfileImage(),userDTO.getBackgroundImage());
+        return new UserSummary(userDTO.getUserId(), userDTO.getUsername(), userDTO.getEmail(), userDTO.getPassword(), userDTO.isActive(), userDTO.getFirstName(), userDTO.getLastName(),userDTO.getJoinDate(),userDTO.getProfileImage(),userDTO.getBackgroundImage(),userDTO.getDescription());
     }
 }

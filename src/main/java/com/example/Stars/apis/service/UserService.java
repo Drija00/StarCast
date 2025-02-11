@@ -45,7 +45,9 @@ public class UserService {
                 LocalDateTime.now(),
                 false,
                 user.getFirstName(),
-                user.getLastName()
+                user.getLastName(),
+                null
+
         );
         commandGateway.sendAndWait(cmd);
         } else{
@@ -133,15 +135,18 @@ public class UserService {
 
     public CompletableFuture<ResponseEntity<?>> login(String username, String password) {
         UserDTO u = queryGateway.query(new GetLoginUserQuery(username, password), ResponseTypes.instanceOf(UserDTO.class)).join();
-        if (u != null) {
-            return commandGateway.send(new LoggingCommand(u.getUserId(), true))
-                    .thenCompose(result -> queryGateway.query(
-                            new GetUserByIdQuery(u.getUserId()),
-                            ResponseTypes.instanceOf(UserDTO.class)
-                    ))
-                    .thenApply(updatedUser -> ResponseEntity.ok(updatedUser));
+        if (u == null) {
+            return CompletableFuture.completedFuture(ResponseEntity.notFound().build());
         }
-        return CompletableFuture.completedFuture(ResponseEntity.notFound().build());
+        if(u.isActive()){
+            return CompletableFuture.completedFuture(new ResponseEntity<>(HttpStatus.FORBIDDEN));
+        }
+        return commandGateway.send(new LoggingCommand(u.getUserId(), true))
+                .thenCompose(result -> queryGateway.query(
+                        new GetUserByIdQuery(u.getUserId()),
+                        ResponseTypes.instanceOf(UserDTO.class)
+                ))
+                .thenApply(updatedUser -> ResponseEntity.ok(updatedUser));
     }
 
     public CompletableFuture<ResponseEntity<?>> logout(UUID userId) {

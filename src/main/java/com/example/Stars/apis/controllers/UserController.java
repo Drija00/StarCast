@@ -2,7 +2,6 @@ package com.example.Stars.apis.controllers;
 
 import com.example.Stars.DTOs.UserDTO;
 import com.example.Stars.DTOs.UserPostDTO;
-import com.example.Stars.queries.read_model.UserSummary;
 import com.example.Stars.apis.service.UserService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -16,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 
 @RestController
 @Profile("client_user")
+@CrossOrigin(origins = "http://localhost:4200")
 public class UserController {
 
     private final UserService userService;

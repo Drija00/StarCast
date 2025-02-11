@@ -40,6 +40,7 @@ private final UserSummaryRepository repository;
                 event.getLastname(),
                 LocalDateTime.now(),
                 null,
+                null,
                 null
         );
         repository.save(user);

@@ -21,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 
 @RestController
 @Profile("client_star")
+@CrossOrigin(origins = "http://localhost:4200")
 public class StarController {
 
     private final StarService starService;
@@ -48,12 +49,12 @@ public class StarController {
     }
 
     @GetMapping("/user/stars")
-    public CompletableFuture<ResponseEntity<List<StarDTO>>> getUserStars(@RequestParam UUID userId) {
-        return starService.getUserStars(userId);
+    public CompletableFuture<ResponseEntity<PageResult<StarDTO>>> getUserStars(@RequestParam UUID userId, int offset, int limit) {
+        return starService.getUserStars(userId, offset, limit);
     }
     @GetMapping("/user/stars/foryou")
-    public CompletableFuture<ResponseEntity<List<StarDTO>>> getUserForYouStars(@RequestParam UUID userId) {
-        return starService.getUserForYouStars(userId);
+    public CompletableFuture<ResponseEntity<PageResult<StarDTO>>> getUserForYouStars(@RequestParam UUID userId, int offset, int limit) {
+        return starService.getUserForYouStars(userId, offset, limit);
     }
 
     @PutMapping("/star")

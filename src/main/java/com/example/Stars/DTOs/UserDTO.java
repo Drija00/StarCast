@@ -24,6 +24,7 @@ public class UserDTO {
     private String firstName;
     private String lastName;
     private LocalDateTime joinDate;
+    private String description;
     private String profileImage;
     private String backgroundImage;
     private Set<UserFollowDTO> following = new HashSet<>();
@@ -32,7 +33,7 @@ public class UserDTO {
         this.userId = userId;
     }
 
-    public UserDTO(UUID userId, String username, String email, String password, boolean active, String firstName, String lastName, LocalDateTime joinDate, String profileImage, String backgroundImage, Set<UserFollowDTO> following) {
+    public UserDTO(UUID userId, String username, String email, String password, boolean active, String firstName, String lastName, LocalDateTime joinDate, String profileImage, String backgroundImage, Set<UserFollowDTO> following,String description) {
         this.userId = userId;
         this.username = username;
         this.email = email;
@@ -44,6 +45,7 @@ public class UserDTO {
         this.profileImage = profileImage;
         this.backgroundImage = backgroundImage;
         this.following = following;
+        this.description = description;
     }
 
     @Override
@@ -57,6 +59,7 @@ public class UserDTO {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", joinDate=" + joinDate +
+                ", description='" + description + '\'' +
                 ", profileImage='" + profileImage + '\'' +
                 ", backgroundImage='" + backgroundImage + '\'' +
                 ", following=" + following +

@@ -32,6 +32,7 @@ public class UserSummary {
     private String firstName;
     private String lastName;
     private LocalDateTime joinDate;
+    private String description;
     private String profileImage;
     private String backgroundImage;
 
@@ -52,7 +53,7 @@ public class UserSummary {
 //    private Set<UserSummary> followers = new HashSet<>();
 
 
-    public UserSummary(UUID userId, String username, String email, String password, boolean active, String firstName, String lastName, LocalDateTime joinDate, String profileImage, String backgroundImage) {
+    public UserSummary(UUID userId, String username, String email, String password, boolean active, String firstName, String lastName, LocalDateTime joinDate, String profileImage, String backgroundImage, String description) {
         this.userId = userId;
         this.username = username;
         this.email = email;
@@ -63,21 +64,24 @@ public class UserSummary {
         this.joinDate = joinDate;
         this.profileImage = profileImage;
         this.backgroundImage = backgroundImage;
+        this.description = description;
     }
 
     @Override
     public String toString() {
         return "UserSummary{" +
-                "backgroundImage='" + backgroundImage + '\'' +
-                ", profileImage='" + profileImage + '\'' +
-                ", joinDate=" + joinDate +
-                ", lastName='" + lastName + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", active=" + active +
-                ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
+                "userId=" + userId +
                 ", username='" + username + '\'' +
-                ", userId=" + userId +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", active=" + active +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", joinDate=" + joinDate +
+                ", description='" + description + '\'' +
+                ", profileImage='" + profileImage + '\'' +
+                ", backgroundImage='" + backgroundImage + '\'' +
+                ", following=" + following +
                 '}';
     }
 

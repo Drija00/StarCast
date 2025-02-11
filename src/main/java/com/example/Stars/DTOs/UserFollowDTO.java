@@ -22,6 +22,7 @@ public class UserFollowDTO {
     private String firstName;
     private String lastName;
     private LocalDateTime joinDate;
+    private String description;
     private String profileImage;
     private String backgroundImage;
 
@@ -29,7 +30,7 @@ public class UserFollowDTO {
         this.userId = userId;
     }
 
-    public UserFollowDTO(UUID userId, String username, String email, String password, boolean active, String firstName, String lastName, LocalDateTime joinDate, String profileImage, String backgroundImage) {
+    public UserFollowDTO(UUID userId, String username, String email, String password, boolean active, String firstName, String lastName, LocalDateTime joinDate, String profileImage, String backgroundImage,String description) {
         this.userId = userId;
         this.username = username;
         this.email = email;
@@ -40,6 +41,7 @@ public class UserFollowDTO {
         this.joinDate = joinDate;
         this.profileImage = profileImage;
         this.backgroundImage = backgroundImage;
+        this.description = description;
     }
 
     @Override
@@ -53,6 +55,7 @@ public class UserFollowDTO {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", joinDate=" + joinDate +
+                ", description='" + description + '\'' +
                 ", profileImage='" + profileImage + '\'' +
                 ", backgroundImage='" + backgroundImage + '\'' +
                 '}';

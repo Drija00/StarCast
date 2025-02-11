@@ -25,7 +25,7 @@ public class Star {
     private Boolean active;
 
     private Set<UUID> likes = new HashSet<>();
-    private Set<String> images = new HashSet<>();
+    private List<String> images = new ArrayList<>();
     //private Set<UUID> followers = new HashSet<>();
 
     public Star() {

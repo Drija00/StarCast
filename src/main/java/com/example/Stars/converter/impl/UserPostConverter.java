@@ -15,6 +15,6 @@ public class UserPostConverter implements DtoEntityConverter<UserPostDTO, UserSu
 
     @Override
     public UserSummary toEntity(UserPostDTO userDTO) {
-        return new UserSummary(null,userDTO.getUsername(), userDTO.getEmail(), userDTO.getPassword(), userDTO.isActive(), userDTO.getFirstName(), userDTO.getLastName(), null, null, null);
+        return new UserSummary(null,userDTO.getUsername(), userDTO.getEmail(), userDTO.getPassword(), userDTO.isActive(), userDTO.getFirstName(), userDTO.getLastName(), null, null, null,null);
     }
 }

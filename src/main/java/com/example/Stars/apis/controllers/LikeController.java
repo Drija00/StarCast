@@ -16,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 @RestController
 @Profile("client_like")
+@CrossOrigin(origins = "http://localhost:4200")
 public class LikeController {
     private final LikeService likeService;
 

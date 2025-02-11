@@ -97,15 +97,21 @@ public class StarService {
 
 
 
-    public CompletableFuture<ResponseEntity<List<StarDTO>>> getUserStars(UUID userId) {
-        return queryGateway.query(new GetUserStarsQuery(userId), ResponseTypes.multipleInstancesOf(StarDTO.class))
-                .thenApply(stars -> ResponseEntity.ok(stars))
+    public CompletableFuture<ResponseEntity<PageResult<StarDTO>>> getUserStars(UUID userId,int offset, int limit) {
+        return queryGateway.query(new GetUserStarsQuery(userId, offset, limit), ResponseTypes.instanceOf(PageResult.class))
+                .thenApply(stars -> {
+                    PageResult<StarDTO> pageResult = (PageResult<StarDTO>) stars;
+                    return ResponseEntity.ok(pageResult);
+                })
                 .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
-    public CompletableFuture<ResponseEntity<List<StarDTO>>> getUserForYouStars(UUID userId) {
-        return queryGateway.query(new GetUserForYouStarsQuery(userId), ResponseTypes.multipleInstancesOf(StarDTO.class))
-                .thenApply(stars -> ResponseEntity.ok(stars))
-                .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+    public CompletableFuture<ResponseEntity<PageResult<StarDTO>>> getUserForYouStars(UUID userId,int offset, int limit) {
+        return queryGateway.query(new GetUserForYouStarsQuery(userId, offset, limit), ResponseTypes.instanceOf(PageResult.class))
+                .thenApply(stars -> {
+                    PageResult<StarDTO> pageResult = (PageResult<StarDTO>) stars;
+                    return ResponseEntity.ok(pageResult);
+                })
+                .exceptionally(ex -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
 }

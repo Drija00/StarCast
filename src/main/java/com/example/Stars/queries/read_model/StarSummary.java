@@ -46,13 +46,13 @@ public class StarSummary {
     @ElementCollection
     @CollectionTable(name = "star_images", joinColumns = @JoinColumn(name = "star_id"))
     @Column(name = "image_path")
-    private Set<String> images;
+    private List<String> images = new ArrayList<>();
 
     public StarSummary(UUID starId) {
         this.starId = starId;
     }
 
-    public StarSummary(UUID starId, String content, UserSummary user, LocalDateTime timestamp, List<LikeSummary> likes, Set<String> images) {
+    public StarSummary(UUID starId, String content, UserSummary user, LocalDateTime timestamp, List<LikeSummary> likes, List<String> images) {
         this.starId = starId;
         this.content = content;
         this.user = user;

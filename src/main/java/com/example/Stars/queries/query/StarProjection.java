@@ -11,6 +11,7 @@ import com.example.Stars.queries.read_model.UserSummary;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
+import org.hibernate.Hibernate;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -84,16 +86,48 @@ public class StarProjection {
     }
 
     @QueryHandler
-    public List<StarDTO> on(GetUserStarsQuery gry){
-        return mStarSummaryRepository.findAllByUserOrderByTimestampDesc(new UserSummary(gry.getUserId())).orElse(null).stream().map(entity -> mStarConverter.toDto(entity))
-                .collect(Collectors.toList());
+    public PageResult on(GetUserStarsQuery gry){
+
+        int offset = gry.getPageNumber() * gry.getPageSize();
+        int limit = gry.getPageSize();
+
+        Pageable pageable = PageRequest.of(offset, limit);
+        List<StarSummary> items = mStarSummaryRepository.findAllByUserOrderByTimestampDesc(new UserSummary(gry.getUserId()),pageable).getContent();
+
+        items.forEach(star -> Hibernate.initialize(star.getImages()));
+        List<StarDTO> itemsDtos = items.stream().map(entity -> mStarConverter.toDto(entity)).collect(Collectors.toList());
+        long totalItems = mStarSummaryRepository.countStarsForUsers(gry.getUserId());
+
+        return new PageResult<>(itemsDtos, totalItems);
     }
 
     @QueryHandler
-    public List<StarDTO> on(GetUserForYouStarsQuery gry){
-//        return mStarSummaryRepository.findAllStarsForUsersForYou(gry.getUserId()).orElse(null).stream().map(entity -> mStarConverter.toDto(entity))
-//                .collect(Collectors.toList());
-        return null;
+    public PageResult on(GetUserForYouStarsQuery gry){
+
+        /*List<StarSummary> fystars = mStarSummaryRepository.findAllByUserOrderByTimestampDesc(new UserSummary(gry.getUserId()))
+                .orElse(Collections.emptyList());
+
+        fystars.forEach(star -> Hibernate.initialize(star.getImages()));
+        List<StarDTO> starsDto = fystars.stream()
+                .map(entity -> mStarConverter.toDto(entity))
+                .collect(Collectors.toList());
+        return starsDto;*/
+
+
+        int offset = gry.getPageNumber() * gry.getPageSize();
+        int limit = gry.getPageSize();
+
+        Pageable pageable = PageRequest.of(offset, limit);
+        List<StarSummary> items = mStarSummaryRepository.findAllStarsForUsersForYou(gry.getUserId(),pageable).getContent();
+        items.forEach(star -> Hibernate.initialize(star.getImages()));
+        List<StarDTO> itemsDtos = items.stream().map(entity -> mStarConverter.toDto(entity)).collect(Collectors.toList());
+        long totalItems = mStarSummaryRepository.countStarsForUsersForYou(gry.getUserId());
+
+        return new PageResult<>(itemsDtos, totalItems);
+
+        //return mStarSummaryRepository.findAllStarsForUsersForYou(gry.getUserId()).orElse(null).stream().map(entity -> mStarConverter.toDto(entity))
+                //.collect(Collectors.toList());
+        //return null;
     }
 
     @QueryHandler
