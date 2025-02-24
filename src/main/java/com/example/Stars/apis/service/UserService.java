@@ -5,6 +5,7 @@ import com.example.Stars.DTOs.UserFollowDTO;
 import com.example.Stars.DTOs.UserPostDTO;
 import com.example.Stars.apis.api.*;
 import com.example.Stars.queries.query.*;
+import com.example.Stars.queries.read_model.PageResult;
 import com.example.Stars.queries.read_model.UserSummary;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
@@ -31,7 +32,7 @@ public class UserService {
         this.userSummaryRepository = userSummaryRepository;
     }
 
-    public void handle(UserPostDTO user) {
+    public UUID handle(UserPostDTO user) {
 
         UserDTO u = queryGateway.query(new GetUserForRegistrationQuery(user.getUsername(),user.getEmail()), ResponseTypes.instanceOf(UserDTO.class)).join();
 
@@ -46,10 +47,10 @@ public class UserService {
                 false,
                 user.getFirstName(),
                 user.getLastName(),
-                null
+                ""
 
         );
-        commandGateway.sendAndWait(cmd);
+        return commandGateway.sendAndWait(cmd);
         } else{
             throw new RuntimeException("User already exists");
         }
@@ -141,12 +142,11 @@ public class UserService {
         if(u.isActive()){
             return CompletableFuture.completedFuture(new ResponseEntity<>(HttpStatus.FORBIDDEN));
         }
-        return commandGateway.send(new LoggingCommand(u.getUserId(), true))
-                .thenCompose(result -> queryGateway.query(
-                        new GetUserByIdQuery(u.getUserId()),
-                        ResponseTypes.instanceOf(UserDTO.class)
-                ))
-                .thenApply(updatedUser -> ResponseEntity.ok(updatedUser));
+        commandGateway.sendAndWait(new LoggingCommand(u.getUserId(), true));
+        return queryGateway.query(
+                new GetUserByIdQuery(u.getUserId()),
+                ResponseTypes.instanceOf(UserDTO.class)
+        ).thenApply(updatedUser -> ResponseEntity.ok(updatedUser));
     }
 
     public CompletableFuture<ResponseEntity<?>> logout(UUID userId) {
@@ -170,6 +170,16 @@ public class UserService {
     public CompletableFuture<ResponseEntity<List<UserDTO>>> getUsers() {
         return queryGateway.query(new GetUsersQuery(), ResponseTypes.multipleInstancesOf(UserDTO.class))
                 .thenApply(users -> ResponseEntity.ok(users))
+                .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+    }
+
+
+    public CompletableFuture<ResponseEntity<PageResult<UserDTO>>> getFitleredUsers(String filter, int offset, int limit) {
+        return queryGateway.query(new GetFilteredUsers(filter,offset,limit),ResponseTypes.instanceOf(PageResult.class))
+                .thenApply(users -> {
+                    PageResult<UserDTO> pageResult = (PageResult<UserDTO>) users;
+                    return ResponseEntity.ok(pageResult);
+                })
                 .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 }

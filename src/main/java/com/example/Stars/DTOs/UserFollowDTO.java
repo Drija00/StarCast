@@ -16,32 +16,18 @@ import java.util.UUID;
 public class UserFollowDTO {
     private UUID userId;
     private String username;
-    private String email;
-    private String password;
-    private boolean active = false;
     private String firstName;
     private String lastName;
-    private LocalDateTime joinDate;
-    private String description;
-    private String profileImage;
-    private String backgroundImage;
 
     public UserFollowDTO(UUID userId) {
         this.userId = userId;
     }
 
-    public UserFollowDTO(UUID userId, String username, String email, String password, boolean active, String firstName, String lastName, LocalDateTime joinDate, String profileImage, String backgroundImage,String description) {
+    public UserFollowDTO(UUID userId, String username, String firstName, String lastName) {
         this.userId = userId;
         this.username = username;
-        this.email = email;
-        this.password = password;
-        this.active = active;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.joinDate = joinDate;
-        this.profileImage = profileImage;
-        this.backgroundImage = backgroundImage;
-        this.description = description;
     }
 
     @Override
@@ -49,15 +35,8 @@ public class UserFollowDTO {
         return "UserFollowDTO{" +
                 "userId=" + userId +
                 ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", active=" + active +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", joinDate=" + joinDate +
-                ", description='" + description + '\'' +
-                ", profileImage='" + profileImage + '\'' +
-                ", backgroundImage='" + backgroundImage + '\'' +
                 '}';
     }
 }

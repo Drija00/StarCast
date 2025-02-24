@@ -1,5 +1,6 @@
 package com.example.Stars.DTOs;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import java.util.*;
 public class StarPostDTO {
     private UUID user_id;
     private String content;
+    @JsonIgnore
     private List<String> images = new ArrayList<>();
 
     public StarPostDTO(UUID user_id) {

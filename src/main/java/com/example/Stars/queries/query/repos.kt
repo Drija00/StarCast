@@ -19,6 +19,12 @@ class GetUserByIdQuery(
     val userId: UUID? = null
 )
 
+class GetFilteredUsers(
+    val filter: String? = null,
+    val pageNumber: Int = 0,
+    val pageSize: Int = 12,
+)
+
 class GetUserForRegistrationQuery(
     val username: String? = null,
     val email: String? = null
@@ -65,10 +71,15 @@ interface UserSummaryRepository : JpaRepository <UserSummary, UUID>{
     fun findByUsername(username: String): Optional<UserSummary>
     fun findByUsernameAndPassword(username: String, password: String): Optional<UserSummary>
     fun findByUsernameOrEmail(username: String, email: String): Optional<UserSummary>
+    @Query("SELECT u FROM UserSummary u where u.username like %:filter% or u.firstName like %:filter% or u.lastName like %:filter%")
+    fun findAllUsersByFilter(filter:String, pageable: Pageable): Page<UserSummary>
+    @Query("SELECT COUNT(u) FROM UserSummary u where u.username like %:filter% or u.firstName like %:filter% or u.lastName like %:filter%")
+    fun countAllUsersByFilter(filter:String): Long
 }
 interface StarSummaryRepository : JpaRepository <StarSummary, UUID>{
     @Query("SELECT s FROM StarSummary s LEFT JOIN FETCH s.likes LEFT JOIN FETCH s.images")
     override fun findAll(pageable: Pageable): Page<StarSummary>
+    @Query("SELECT s FROM StarSummary s LEFT JOIN FETCH s.images WHERE s.starId=:starId" )
     fun findByStarId(starId: UUID): Optional<StarSummary>
     @Query(
         "SELECT s FROM StarSummary s WHERE s.user IN ( SELECT f FROM UserSummary u JOIN u.following f WHERE u.userId = :userId) OR s.user.userId = :userId ORDER BY s.timestamp DESC"

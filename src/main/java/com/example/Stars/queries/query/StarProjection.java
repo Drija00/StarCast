@@ -82,7 +82,9 @@ public class StarProjection {
     @QueryHandler
     public StarDTO on(GetStarQuery gry){
         StarSummary ss = mStarSummaryRepository.findByStarId(gry.getStar_id()).orElse(null);
-        return ss!=null?mStarConverter.toDto(ss):null;
+
+        Hibernate.initialize(ss.getImages());
+        return mStarConverter.toDto(ss);
     }
 
     @QueryHandler

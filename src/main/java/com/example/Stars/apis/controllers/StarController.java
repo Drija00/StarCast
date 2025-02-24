@@ -11,8 +11,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -28,6 +30,22 @@ public class StarController {
 
     public StarController(StarService starService) {
         this.starService = starService;
+    }
+
+    @PostMapping(value = "/star/upload",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public StarDTO uploadPost(
+            @RequestPart(name = "post") StarPostDTO starPostDTO,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images) {
+        if(starPostDTO.getUser_id() != null && starPostDTO.getContent() != null) {
+            try {
+                return starService.handle(starPostDTO,images);
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+            }
+        }else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     @PostMapping("/star")

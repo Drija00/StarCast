@@ -3,7 +3,9 @@ package com.example.Stars.apis.controllers;
 import com.example.Stars.DTOs.UserDTO;
 import com.example.Stars.DTOs.UserPostDTO;
 import com.example.Stars.apis.service.UserService;
+import com.example.Stars.queries.read_model.PageResult;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +27,9 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public void handle(@RequestBody UserPostDTO user) {
+    public UUID handle(@RequestBody UserPostDTO user) {
         if(user != null) {
-            userService.handle(user);
+            return userService.handle(user);
         }else{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
@@ -39,6 +41,7 @@ public class UserController {
     }
     @PutMapping("/user/logout")
     public CompletableFuture<ResponseEntity<?>> logout(@RequestParam UUID user_id) {
+
         return userService.logout(user_id);
     }
     @PutMapping("/user/follow")
@@ -59,6 +62,11 @@ public class UserController {
     @GetMapping("/users")
     public CompletableFuture<ResponseEntity<List<UserDTO>>> getUsers() {
         return userService.getUsers();
+    }
+
+    @GetMapping("/users/filter")
+    public CompletableFuture<ResponseEntity<PageResult<UserDTO>>> getUsers(@RequestParam String filter, int offset, int limit) {
+        return userService.getFitleredUsers(filter,offset,limit);
     }
 
 }

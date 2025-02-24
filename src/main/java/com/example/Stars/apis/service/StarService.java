@@ -2,6 +2,7 @@ package com.example.Stars.apis.service;
 
 import com.example.Stars.DTOs.StarDTO;
 import com.example.Stars.DTOs.StarPostDTO;
+import com.example.Stars.DTOs.UserDTO;
 import com.example.Stars.apis.api.DeleteStarCommand;
 import com.example.Stars.apis.api.PostStarCommand;
 import com.example.Stars.apis.api.UpdateStarCommand;
@@ -16,8 +17,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -25,6 +31,7 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class StarService {
 
+    private static final String UPLOAD_DIR = System.getProperty("user.dir") + File.separator + "uploads";
     private CommandGateway commandGateway;
     private QueryGateway queryGateway;
     private StarSummaryRepository summaryRepository;
@@ -35,6 +42,47 @@ public class StarService {
         this.queryGateway = queryGateway;
         this.summaryRepository = summaryRepository;
         this.userSummaryRepository = userSummaryRepository;
+    }
+
+    public StarDTO handle(StarPostDTO starPostDTO, List<MultipartFile> images) throws Exception {
+        List<String> imagePaths = new ArrayList<>();
+
+        File uploadDir = new File(UPLOAD_DIR);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+
+        if (images != null && !images.isEmpty()) {
+            for (MultipartFile image : images) {
+                String imageName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+                File file = new File(uploadDir, imageName);
+                try {
+                    image.transferTo(file);
+                    imagePaths.add("/uploads/" + imageName);
+                } catch (IOException e) {
+                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+                }
+            }
+        }
+
+        starPostDTO.setImages(imagePaths);
+
+        try{
+            PostStarCommand cmd = new PostStarCommand(
+                    UUID.randomUUID(),
+                    starPostDTO.getContent(),
+                    starPostDTO.getUser_id(),
+                    LocalDateTime.now(),
+                    true,
+                    starPostDTO.getImages()
+            );
+            UUID newId = commandGateway.sendAndWait(cmd);
+            StarDTO starDTO =  queryGateway.query(new GetStarQuery(newId), ResponseTypes.instanceOf(StarDTO.class)).join();
+            return starDTO;
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return null;
     }
 
     public void handle(StarPostDTO starPostDTO) throws Exception {

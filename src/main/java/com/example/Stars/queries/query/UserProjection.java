@@ -1,14 +1,20 @@
 package com.example.Stars.queries.query;
 
+import com.example.Stars.DTOs.StarDTO;
 import com.example.Stars.DTOs.UserDTO;
 import com.example.Stars.apis.api.*;
 import com.example.Stars.converter.impl.UserConverter;
+import com.example.Stars.queries.read_model.PageResult;
+import com.example.Stars.queries.read_model.StarSummary;
 import com.example.Stars.queries.read_model.UserSummary;
 import com.example.Stars.write_model.User;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
+import org.hibernate.Hibernate;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -112,7 +118,29 @@ private final UserSummaryRepository repository;
     @QueryHandler
     public UserDTO on(GetUserByIdQuery qry){
         UserSummary us = repository.findById(qry.getUserId()).orElse(null);
+        //if(us==null) return null;
         return us!=null?userConverter.toDto(us):null;
+    }
+
+
+    @QueryHandler
+    public PageResult on(GetFilteredUsers gry){
+        try {
+            int offset = gry.getPageNumber() * gry.getPageSize();
+            int limit = gry.getPageSize();
+
+            Pageable pageable = PageRequest.of(offset, limit);
+            List<UserSummary> users = repository.findAllUsersByFilter(gry.getFilter(), pageable).getContent();
+
+            users.forEach(user -> Hibernate.initialize(user.getFollowing()));
+            List<UserDTO> userDTOS = users.stream().map(entity -> userConverter.toDto(entity)).collect(Collectors.toList());
+            long totalUsers = repository.countAllUsersByFilter(gry.getFilter());
+
+            return new PageResult<>(userDTOS, totalUsers);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Failed to fetch users", e);
+        }
     }
 
     @QueryHandler

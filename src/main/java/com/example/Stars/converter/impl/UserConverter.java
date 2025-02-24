@@ -18,6 +18,7 @@ public class UserConverter implements DtoEntityConverter<UserDTO, UserSummary> {
     @Override
     public UserDTO toDto(UserSummary userSummary) {
         return new UserDTO(userSummary.getUserId(),userSummary.getUsername(),userSummary.getEmail(), userSummary.getPassword(), userSummary.isActive(), userSummary.getFirstName(), userSummary.getLastName(), userSummary.getJoinDate(), userSummary.getProfileImage(), userSummary.getBackgroundImage(), userSummary.getFollowing().stream().map(entity -> followConverter.toDto(entity))
+                .collect(Collectors.toSet()), userSummary.getFollowers().stream().map(entity -> followConverter.toDto(entity))
                 .collect(Collectors.toSet()), userSummary.getDescription());
     }
 

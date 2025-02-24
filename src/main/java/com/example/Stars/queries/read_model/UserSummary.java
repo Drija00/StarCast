@@ -48,9 +48,9 @@ public class UserSummary {
             inverseJoinColumns = @JoinColumn(name = "followee_id"))
     @JsonIgnore
     private Set<UserSummary> following = new HashSet<>();
-//
-//    @ManyToMany(mappedBy = "following",fetch = FetchType.LAZY)
-//    private Set<UserSummary> followers = new HashSet<>();
+
+    @ManyToMany(mappedBy = "following",fetch = FetchType.LAZY)
+    private Set<UserSummary> followers = new HashSet<>();
 
 
     public UserSummary(UUID userId, String username, String email, String password, boolean active, String firstName, String lastName, LocalDateTime joinDate, String profileImage, String backgroundImage, String description) {
