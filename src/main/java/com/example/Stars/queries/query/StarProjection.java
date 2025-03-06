@@ -13,10 +13,8 @@ import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.hibernate.Hibernate;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
+import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -89,60 +87,34 @@ public class StarProjection {
 
     @QueryHandler
     public PageResult on(GetUserStarsQuery gry){
-
-        int offset = gry.getPageNumber() * gry.getPageSize();
-        int limit = gry.getPageSize();
-
-        Pageable pageable = PageRequest.of(offset, limit);
-        List<StarSummary> items = mStarSummaryRepository.findAllByUserOrderByTimestampDesc(new UserSummary(gry.getUserId()),pageable).getContent();
+        Pageable pageable = PageRequest.of(gry.getPageNumber(), gry.getPageSize(), Sort.by("timestamp").descending());
+        Page<StarSummary> items = mStarSummaryRepository.findAllByUser(new UserSummary(gry.getUserId()),pageable);
 
         items.forEach(star -> Hibernate.initialize(star.getImages()));
-        List<StarDTO> itemsDtos = items.stream().map(entity -> mStarConverter.toDto(entity)).collect(Collectors.toList());
-        long totalItems = mStarSummaryRepository.countStarsForUsers(gry.getUserId());
+        List<StarDTO> itemsDtos = items.getContent().stream().map(entity -> mStarConverter.toDto(entity)).collect(Collectors.toList());
 
-        return new PageResult<>(itemsDtos, totalItems);
+        return new PageResult<>(itemsDtos, items.getTotalElements());
     }
 
     @QueryHandler
     public PageResult on(GetUserForYouStarsQuery gry){
 
-        /*List<StarSummary> fystars = mStarSummaryRepository.findAllByUserOrderByTimestampDesc(new UserSummary(gry.getUserId()))
-                .orElse(Collections.emptyList());
-
-        fystars.forEach(star -> Hibernate.initialize(star.getImages()));
-        List<StarDTO> starsDto = fystars.stream()
-                .map(entity -> mStarConverter.toDto(entity))
-                .collect(Collectors.toList());
-        return starsDto;*/
-
-
-        int offset = gry.getPageNumber() * gry.getPageSize();
-        int limit = gry.getPageSize();
-
-        Pageable pageable = PageRequest.of(offset, limit);
-        List<StarSummary> items = mStarSummaryRepository.findAllStarsForUsersForYou(gry.getUserId(),pageable).getContent();
+        Pageable pageable = PageRequest.of(gry.getPageNumber(), gry.getPageSize(), Sort.by("timestamp").descending());
+        Page<StarSummary> items = mStarSummaryRepository.findAllStarsForUsersForYou(gry.getUserId(),pageable);
         items.forEach(star -> Hibernate.initialize(star.getImages()));
-        List<StarDTO> itemsDtos = items.stream().map(entity -> mStarConverter.toDto(entity)).collect(Collectors.toList());
-        long totalItems = mStarSummaryRepository.countStarsForUsersForYou(gry.getUserId());
+        List<StarDTO> itemsDtos = items.getContent().stream().map(entity -> mStarConverter.toDto(entity)).collect(Collectors.toList());
 
-        return new PageResult<>(itemsDtos, totalItems);
-
-        //return mStarSummaryRepository.findAllStarsForUsersForYou(gry.getUserId()).orElse(null).stream().map(entity -> mStarConverter.toDto(entity))
-                //.collect(Collectors.toList());
-        //return null;
+        return new PageResult<>(itemsDtos, items.getTotalElements());
     }
 
     @QueryHandler
     public PageResult on(GetStarsQuery query) {
-        int offset = query.getPageNumber() * query.getPageSize();
-        int limit = query.getPageSize();
 
-        Pageable pageable = PageRequest.of(offset, limit);
-        List<StarSummary> items = mStarSummaryRepository.findAll(pageable).getContent();
-        List<StarDTO> itemsDtos = items.stream().map(entity -> mStarConverter.toDto(entity)).collect(Collectors.toList());
-        long totalItems = mStarSummaryRepository.count();
+        Pageable pageable = PageRequest.of(query.getPageNumber(), query.getPageSize(), Sort.by("timestamp").descending());
+        Page<StarSummary> items = mStarSummaryRepository.findAll(pageable);
+        List<StarDTO> itemsDtos = items.getContent().stream().map(entity -> mStarConverter.toDto(entity)).collect(Collectors.toList());
 
-        return new PageResult<>(itemsDtos, totalItems);
+        return new PageResult<>(itemsDtos, items.getTotalElements());
     }
 
 }

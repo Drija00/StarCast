@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class UserFollowConverter implements DtoEntityConverter<UserFollowDTO, UserSummary> {
     @Override
     public UserFollowDTO toDto(UserSummary userSummary) {
-        return new UserFollowDTO(userSummary.getUserId(),userSummary.getUsername(),userSummary.getFirstName(), userSummary.getLastName());
+        return new UserFollowDTO(userSummary.getUserId(),userSummary.getUsername(),userSummary.getFirstName(), userSummary.getLastName(),userSummary.getProfileImage());
     }
 
     @Override

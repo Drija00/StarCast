@@ -1,8 +1,6 @@
 package com.example.Stars.apis.service;
 
-import com.example.Stars.DTOs.UserDTO;
-import com.example.Stars.DTOs.UserFollowDTO;
-import com.example.Stars.DTOs.UserPostDTO;
+import com.example.Stars.DTOs.*;
 import com.example.Stars.apis.api.*;
 import com.example.Stars.queries.query.*;
 import com.example.Stars.queries.read_model.PageResult;
@@ -13,8 +11,13 @@ import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -22,6 +25,7 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class UserService {
 
+    private static final String UPLOAD_DIR = System.getProperty("user.dir") + File.separator + "uploads";
     private CommandGateway commandGateway;
     private QueryGateway queryGateway;
     private UserSummaryRepository userSummaryRepository;
@@ -82,16 +86,15 @@ public class UserService {
         }
         return CompletableFuture.completedFuture(new ResponseEntity<>(HttpStatus.OK));
     }
-
-    public CompletableFuture<ResponseEntity<?>> setProfileImage(UUID userID, String profileImage) throws Exception {
-        UserDTO u = queryGateway.query(new GetUserByIdQuery(userID),ResponseTypes.instanceOf(UserDTO.class)).join();
+    public CompletableFuture<ResponseEntity<?>> unfollow(UUID followerId, String followeeUsername) throws Exception {
+        UserDTO u = queryGateway.query(new GetUserByUsernameQuery(followeeUsername),ResponseTypes.instanceOf(UserDTO.class)).join();
 
         if(u!=null) {
             System.out.println(u.getUserId());
 
-            UserSetProfileImageCommand cmd = new UserSetProfileImageCommand(
-                    u.getUserId(),
-                    profileImage
+            UserUnfollowedCommand cmd = new UserUnfollowedCommand(
+                    followerId,
+                    u.getUserId()
             );
             commandGateway.sendAndWait(cmd);
 
@@ -104,22 +107,44 @@ public class UserService {
 //            );
 //            commandGateway.sendAndWait(cmd);
         }else{
-            throw new Exception("Error trying to follow user");
+            throw new Exception("Error trying to unfollow user");
         }
         return CompletableFuture.completedFuture(new ResponseEntity<>(HttpStatus.OK));
     }
-    public CompletableFuture<ResponseEntity<?>> setBackgroundImage(UUID userID, String backgroundImage) throws Exception {
+
+    public CompletableFuture<ResponseEntity<?>> setProfileImage(UUID userID, MultipartFile profileImage) throws Exception {
         UserDTO u = queryGateway.query(new GetUserByIdQuery(userID),ResponseTypes.instanceOf(UserDTO.class)).join();
 
+        String imagePath = "";
         if(u!=null) {
             System.out.println(u.getUserId());
 
-            UserSetBackgroundImageCommand cmd = new UserSetBackgroundImageCommand(
+
+            File uploadDir = new File(UPLOAD_DIR);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+
+            if (profileImage != null && !profileImage.isEmpty()) {
+                String imageName = System.currentTimeMillis() + "_" + profileImage.getOriginalFilename();
+                File file = new File(uploadDir, imageName);
+                try {
+                    profileImage.transferTo(file);
+                    imagePath = "/uploads/" + imageName;
+                } catch (IOException e) {
+                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+                }
+            }
+
+            u.setProfileImage(imagePath);
+
+            UserSetProfileImageCommand cmd = new UserSetProfileImageCommand(
                     u.getUserId(),
-                    backgroundImage
+                    imagePath
             );
             commandGateway.sendAndWait(cmd);
 
+            return CompletableFuture.completedFuture(new ResponseEntity<>(new SetProfileResponse(imagePath), HttpStatus.OK));
 //            FollowUserCommand cmd = new FollowUserCommand(
 //                    UUID.randomUUID(),
 //                    followerId,
@@ -129,9 +154,77 @@ public class UserService {
 //            );
 //            commandGateway.sendAndWait(cmd);
         }else{
-            throw new Exception("Error trying to follow user");
+            throw new Exception("Error trying to set user profile image");
         }
-        return CompletableFuture.completedFuture(new ResponseEntity<>(HttpStatus.OK));
+    }
+    public CompletableFuture<ResponseEntity<?>> setDescription(UUID userID, String description) throws Exception {
+        UserDTO u = queryGateway.query(new GetUserByIdQuery(userID),ResponseTypes.instanceOf(UserDTO.class)).join();
+
+            if(u!=null) {
+            UserSetDescriptionCommand cmd = new UserSetDescriptionCommand(
+                    u.getUserId(),
+                    description
+            );
+            commandGateway.sendAndWait(cmd);
+
+            return CompletableFuture.completedFuture(new ResponseEntity<>(new SetDescriptionResponse(description), HttpStatus.OK));
+//            FollowUserCommand cmd = new FollowUserCommand(
+//                    UUID.randomUUID(),
+//                    followerId,
+//                    u.getUserId(),
+//                    LocalDateTime.now(),
+//                    true
+//            );
+//            commandGateway.sendAndWait(cmd);
+        }else{
+            throw new Exception("Error trying to set user description");
+        }
+    }
+    public CompletableFuture<ResponseEntity<?>> setBackgroundImage(UUID userID, MultipartFile backgroundImage) throws Exception {
+        UserDTO u = queryGateway.query(new GetUserByIdQuery(userID),ResponseTypes.instanceOf(UserDTO.class)).join();
+
+        String imagePath = "";
+        if(u!=null) {
+            System.out.println(u.getUserId());
+
+
+            File uploadDir = new File(UPLOAD_DIR);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+
+            if (backgroundImage != null && !backgroundImage.isEmpty()) {
+                String imageName = System.currentTimeMillis() + "_" + backgroundImage.getOriginalFilename();
+                File file = new File(uploadDir, imageName);
+                try {
+                    backgroundImage.transferTo(file);
+                    imagePath = "/uploads/" + imageName;
+                } catch (IOException e) {
+                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+                }
+            }
+
+
+            u.setBackgroundImage(imagePath);
+
+            UserSetBackgroundImageCommand cmd = new UserSetBackgroundImageCommand(
+                    u.getUserId(),
+                    imagePath
+            );
+            commandGateway.sendAndWait(cmd);
+
+            return CompletableFuture.completedFuture(new ResponseEntity<>(new SetBackgroundResponse(imagePath),HttpStatus.OK));
+//            FollowUserCommand cmd = new FollowUserCommand(
+//                    UUID.randomUUID(),
+//                    followerId,
+//                    u.getUserId(),
+//                    LocalDateTime.now(),
+//                    true
+//            );
+//            commandGateway.sendAndWait(cmd);
+        }else{
+            throw new Exception("Error trying to set user background image");
+        }
     }
 
     public CompletableFuture<ResponseEntity<?>> login(String username, String password) {
@@ -170,6 +263,12 @@ public class UserService {
     public CompletableFuture<ResponseEntity<List<UserDTO>>> getUsers() {
         return queryGateway.query(new GetUsersQuery(), ResponseTypes.multipleInstancesOf(UserDTO.class))
                 .thenApply(users -> ResponseEntity.ok(users))
+                .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+    }
+
+    public CompletableFuture<ResponseEntity<UserDTO>> getUserById(UUID userId) {
+        return queryGateway.query(new GetUserByIdQuery(userId), ResponseTypes.instanceOf(UserDTO.class))
+                .thenApply(user -> ResponseEntity.ok(user))
                 .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 

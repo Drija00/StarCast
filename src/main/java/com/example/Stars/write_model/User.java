@@ -83,6 +83,15 @@ public class User {
         );
     }
     @CommandHandler
+    public void handle(UserSetDescriptionCommand cmd) {
+        AggregateLifecycle.apply(
+          new UserSetDescriptionEvent(
+                  cmd.getUserId(),
+                  cmd.getDescription()
+          )
+        );
+    }
+    @CommandHandler
     public void handle(UserSetBackgroundImageCommand cmd) {
         AggregateLifecycle.apply(
           new UserSetBackgroundImageEvent(

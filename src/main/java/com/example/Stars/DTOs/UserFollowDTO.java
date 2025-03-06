@@ -18,16 +18,18 @@ public class UserFollowDTO {
     private String username;
     private String firstName;
     private String lastName;
+    private String profileImage;
 
     public UserFollowDTO(UUID userId) {
         this.userId = userId;
     }
 
-    public UserFollowDTO(UUID userId, String username, String firstName, String lastName) {
+    public UserFollowDTO(UUID userId, String username, String firstName, String lastName, String profileImage) {
         this.userId = userId;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.profileImage = profileImage;
     }
 
     @Override
@@ -37,6 +39,7 @@ public class UserFollowDTO {
                 ", username='" + username + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
+                ", profilePicture='" + profileImage + '\'' +
                 '}';
     }
 }

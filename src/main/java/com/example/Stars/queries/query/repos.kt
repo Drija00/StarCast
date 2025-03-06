@@ -82,18 +82,18 @@ interface StarSummaryRepository : JpaRepository <StarSummary, UUID>{
     @Query("SELECT s FROM StarSummary s LEFT JOIN FETCH s.images WHERE s.starId=:starId" )
     fun findByStarId(starId: UUID): Optional<StarSummary>
     @Query(
-        "SELECT s FROM StarSummary s WHERE s.user IN ( SELECT f FROM UserSummary u JOIN u.following f WHERE u.userId = :userId) OR s.user.userId = :userId ORDER BY s.timestamp DESC"
+        "SELECT s FROM StarSummary s WHERE s.user.userId IN ( SELECT f.userId FROM UserSummary u JOIN u.following f WHERE u.userId = :userId) OR s.user.userId = :userId"
     )
     fun findAllStarsForUsersForYou(userId: UUID, pageable: Pageable): Page<StarSummary>
     @Query(
-        " SELECT COUNT(s) FROM StarSummary s WHERE s.user IN (SELECT f FROM UserSummary u JOIN u.following f WHERE u.userId = :userId) OR s.user.userId = :userId"
+        " SELECT COUNT(s) FROM StarSummary s WHERE s.user.userId IN (SELECT f.userId FROM UserSummary u JOIN u.following f WHERE u.userId = :userId) OR s.user.userId = :userId"
     )
     fun countStarsForUsersForYou(userId: UUID): Long
 
     @Query("SELECT COUNT(s) FROM StarSummary s WHERE s.user.userId = :userId")
     fun countStarsForUsers(userId: UUID): Long
 
-    fun findAllByUserOrderByTimestampDesc(user: UserSummary, pageable: Pageable): Page<StarSummary>
+    fun findAllByUser(user: UserSummary, pageable: Pageable): Page<StarSummary>
 }
 //interface FollowSummaryRepository : JpaRepository <FollowSummary, UUID>
 //{

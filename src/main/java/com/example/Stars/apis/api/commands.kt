@@ -11,6 +11,7 @@ data class RegisterUserCommand(@TargetAggregateIdentifier val userId: UUID, val 
 data class LoggingCommand(@TargetAggregateIdentifier val userId: UUID, val active: Boolean)
 data class UserFollowedCommand(@TargetAggregateIdentifier val followerId: UUID, val followeeId: UUID)
 data class UserUnfollowedCommand(@TargetAggregateIdentifier val followerId: UUID, val followeeId: UUID)
+data class UserSetDescriptionCommand(@TargetAggregateIdentifier val userId: UUID, val description: String)
 data class UserSetProfileImageCommand(@TargetAggregateIdentifier val userId: UUID, val profileImageUrl: String)
 data class UserSetBackgroundImageCommand(@TargetAggregateIdentifier val userId: UUID, val backgroundImage: String)
 

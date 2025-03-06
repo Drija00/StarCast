@@ -9,10 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Data
@@ -82,6 +79,7 @@ public class UserSummary {
                 ", profileImage='" + profileImage + '\'' +
                 ", backgroundImage='" + backgroundImage + '\'' +
                 ", following=" + following +
+                ", followers=" + followers +
                 '}';
     }
 

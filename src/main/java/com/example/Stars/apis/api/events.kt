@@ -11,6 +11,7 @@ data class UserLogingEvent(val userId: UUID, val active: Boolean)
 data class UserUserFollowedEvent(val followerId: UUID, val followeeId: UUID)
 data class UserUserUnfollowedEvent(val followerId: UUID, val followeeId: UUID)
 data class UserSetProfileImageEvent(val userId: UUID, val profileImageUrl: String)
+data class UserSetDescriptionEvent(val userId: UUID, val description: String)
 data class UserSetBackgroundImageEvent(val userId: UUID, val backgroundImage: String)
 
 data class UserFollowedEvent(val followId: UUID, val followerId: UUID, val followeeId: UUID, val timestamp : LocalDateTime, val active: Boolean)

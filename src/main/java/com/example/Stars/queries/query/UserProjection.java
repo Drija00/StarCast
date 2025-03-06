@@ -82,6 +82,16 @@ private final UserSummaryRepository repository;
             throw new RuntimeException("User not found");
         }
     }
+    @EventHandler
+    public void on(UserSetDescriptionEvent evt){
+        UserSummary user = repository.findById(evt.getUserId()).orElse(null);
+        if(user != null){
+            user.setDescription(evt.getDescription());
+            repository.save(user);
+        }else{
+            throw new RuntimeException("User not found");
+        }
+    }
 
     @EventHandler
     public void on(UserUserFollowedEvent event) {
@@ -92,6 +102,18 @@ private final UserSummaryRepository repository;
                 .orElseThrow(() -> new IllegalArgumentException("Followee not found"));
 
         follower.getFollowing().add(followee);
+
+        repository.save(follower);
+    }
+    @EventHandler
+    public void on(UserUserUnfollowedEvent event) {
+        System.out.println("i");
+        UserSummary follower = repository.findById(event.getFollowerId())
+                .orElseThrow(() -> new IllegalArgumentException("Follower not found"));
+        UserSummary followee = repository.findById(event.getFolloweeId())
+                .orElseThrow(() -> new IllegalArgumentException("Followee not found"));
+
+        follower.getFollowing().remove(followee);
 
         repository.save(follower);
     }
