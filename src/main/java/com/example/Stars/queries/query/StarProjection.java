@@ -60,6 +60,8 @@ public class StarProjection {
 
     @EventHandler
     public void on(StarDeletedEvent event) {
+        StarSummary s = mStarSummaryRepository.findByStarId(event.getStarId()).orElseThrow(() -> new RuntimeException("Star not found"));
+
         mStarSummaryRepository.deleteById(event.getStarId());
     }
 

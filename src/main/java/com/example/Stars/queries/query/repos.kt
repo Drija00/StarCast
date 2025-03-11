@@ -94,6 +94,7 @@ interface StarSummaryRepository : JpaRepository <StarSummary, UUID>{
     fun countStarsForUsers(userId: UUID): Long
 
     fun findAllByUser(user: UserSummary, pageable: Pageable): Page<StarSummary>
+
 }
 //interface FollowSummaryRepository : JpaRepository <FollowSummary, UUID>
 //{
