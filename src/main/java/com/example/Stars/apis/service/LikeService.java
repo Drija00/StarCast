@@ -2,11 +2,14 @@ package com.example.Stars.apis.service;
 
 import com.example.Stars.DTOs.LikeDTO;
 import com.example.Stars.DTOs.StarDTO;
+import com.example.Stars.DTOs.UserDTO;
 import com.example.Stars.apis.api.LikeStarCommand;
+import com.example.Stars.apis.api.MessageCommand;
 import com.example.Stars.apis.api.UnlikeStarCommand;
+import com.example.Stars.queries.read_model.Notification;
+import com.example.Stars.apis.service.notification.NotificationService;
+import com.example.Stars.queries.read_model.NotificationStatus;
 import com.example.Stars.queries.query.*;
-import com.example.Stars.queries.read_model.LikeSummary;
-import com.example.Stars.queries.read_model.StarSummary;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
@@ -27,18 +30,21 @@ public class LikeService {
     private LikeRepository likeRepository;
     private UserSummaryRepository userSummaryRepository;
     private StarSummaryRepository starSummaryRepository;
+    private final NotificationService notificationService;
 
-    public LikeService(CommandGateway commandGateway, QueryGateway queryGateway, LikeRepository likeRepository, UserSummaryRepository userSummaryRepository, StarSummaryRepository starSummaryRepository) {
+    public LikeService(CommandGateway commandGateway, QueryGateway queryGateway, LikeRepository likeRepository, UserSummaryRepository userSummaryRepository, StarSummaryRepository starSummaryRepository, NotificationService notificationService) {
         this.commandGateway = commandGateway;
         this.queryGateway = queryGateway;
         this.likeRepository = likeRepository;
         this.userSummaryRepository = userSummaryRepository;
         this.starSummaryRepository = starSummaryRepository;
+        this.notificationService = notificationService;
     }
 
     public void handle(UUID userId, UUID starId) throws Exception {
         //UserSummary u = queryGateway.query(new GetUserQuery(likeSummary.getUser().getUsername()), ResponseTypes.instanceOf(UserSummary.class)).join();
         StarDTO s = queryGateway.query(new GetStarQuery(starId), ResponseTypes.instanceOf(StarDTO.class)).join();
+        UserDTO u = queryGateway.query(new GetUserByIdQuery(userId), ResponseTypes.instanceOf(UserDTO.class)).join();
 
         if(s!=null){
             LikeStarCommand cmd = new LikeStarCommand(
@@ -48,7 +54,24 @@ public class LikeService {
                     LocalDateTime.now(),
                     true
             );
-            commandGateway.send(cmd);
+            commandGateway.sendAndWait(cmd);
+            MessageCommand cmdMsg = new MessageCommand(
+                    UUID.randomUUID(),
+                    "User "+u.getUsername()+" liked your \""+ s.getContent().substring(0,10) +"...\" star!",
+                    s.getUser().getUserId(),
+                    LocalDateTime.now(),
+                    NotificationStatus.LIKE
+            );
+            commandGateway.sendAndWait(cmdMsg);
+            notificationService.sendNotification(
+                    s.getUser().getUserId(),
+                    Notification.builder()
+                            .status(NotificationStatus.LIKE)
+                            .message("User "+u.getUsername()+" liked your \""+ s.getContent().substring(0,10) +"...\" star!")
+                            .build()
+            );
+
+
         }else{
             throw new Exception("Error trying to like a star");
         }
@@ -66,7 +89,8 @@ public class LikeService {
                     LocalDateTime.now(),
                     false
             );
-            commandGateway.send(cmd);
+            commandGateway.sendAndWait(cmd);
+
         }else{
             throw new Exception("Error trying to unlike a star");
         }

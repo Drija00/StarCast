@@ -2,9 +2,11 @@ package com.example.Stars.apis.service;
 
 import com.example.Stars.DTOs.*;
 import com.example.Stars.apis.api.*;
+import com.example.Stars.queries.read_model.Notification;
+import com.example.Stars.apis.service.notification.NotificationService;
+import com.example.Stars.queries.read_model.NotificationStatus;
 import com.example.Stars.queries.query.*;
 import com.example.Stars.queries.read_model.PageResult;
-import com.example.Stars.queries.read_model.UserSummary;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
@@ -17,7 +19,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -29,11 +30,13 @@ public class UserService {
     private CommandGateway commandGateway;
     private QueryGateway queryGateway;
     private UserSummaryRepository userSummaryRepository;
+    private final NotificationService notificationService;
 
-    public UserService(CommandGateway commandGateway, QueryGateway queryGateway, UserSummaryRepository userSummaryRepository) {
+    public UserService(CommandGateway commandGateway, QueryGateway queryGateway, UserSummaryRepository userSummaryRepository, NotificationService notificationService) {
         this.commandGateway = commandGateway;
         this.queryGateway = queryGateway;
         this.userSummaryRepository = userSummaryRepository;
+        this.notificationService = notificationService;
     }
 
     public UUID handle(UserPostDTO user) {
@@ -63,6 +66,7 @@ public class UserService {
 
     public CompletableFuture<ResponseEntity<?>> follow(UUID followerId, String followeeUsername) throws Exception {
         UserDTO u = queryGateway.query(new GetUserByUsernameQuery(followeeUsername),ResponseTypes.instanceOf(UserDTO.class)).join();
+        UserDTO follower = queryGateway.query(new GetUserByIdQuery(followerId),ResponseTypes.instanceOf(UserDTO.class)).join();
 
         if(u!=null) {
             System.out.println(u.getUserId());
@@ -72,6 +76,23 @@ public class UserService {
                     u.getUserId()
             );
             commandGateway.sendAndWait(cmd);
+
+            commandGateway.sendAndWait(cmd);
+            MessageCommand cmdMsg = new MessageCommand(
+                    UUID.randomUUID(),
+                    "User " + follower.getUsername() + "joined your galaxy!",
+                    u.getUserId(),
+                    LocalDateTime.now(),
+                    NotificationStatus.FOLLOW
+            );
+            commandGateway.sendAndWait(cmdMsg);
+
+            notificationService.sendNotification(u.getUserId(),
+                    Notification.builder()
+                            .status(NotificationStatus.FOLLOW)
+                            .message("User " + follower.getUsername() + "joined your galaxy!")
+                            .build()
+                    );
 
 //            FollowUserCommand cmd = new FollowUserCommand(
 //                    UUID.randomUUID(),

@@ -1,12 +1,15 @@
 package com.example.Stars.queries.query
 
 import com.example.Stars.queries.read_model.LikeSummary
+import com.example.Stars.queries.read_model.Notification
 import com.example.Stars.queries.read_model.StarSummary
 import com.example.Stars.queries.read_model.UserSummary
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
+import java.time.LocalDateTime
 import java.util.Optional
 import java.util.UUID
 
@@ -67,6 +70,12 @@ class GetStarLikesQuery(
     val star_id: UUID? = null
 )
 
+class GetNotiicationsForUser(
+    val user_id: UUID,
+    val pageNumber: Int = 0,
+    val pageSize: Int = 12,
+)
+
 interface UserSummaryRepository : JpaRepository <UserSummary, UUID>{
     fun findByUsername(username: String): Optional<UserSummary>
     fun findByUsernameAndPassword(username: String, password: String): Optional<UserSummary>
@@ -96,6 +105,15 @@ interface StarSummaryRepository : JpaRepository <StarSummary, UUID>{
     fun findAllByUser(user: UserSummary, pageable: Pageable): Page<StarSummary>
 
 }
+    interface NotificationRepository : JpaRepository <Notification, UUID>{
+        @Query("SELECT n FROM Notification n WHERE n.user = :user AND n.timestamp >= :oneWeekAgo")
+        fun findRecentNotifications(
+            @Param("user") user: UserSummary,
+            @Param("oneWeekAgo") oneWeekAgo: LocalDateTime,
+            pageable: Pageable
+        ): Page<Notification>
+    }
+
 //interface FollowSummaryRepository : JpaRepository <FollowSummary, UUID>
 //{
 //    fun findByFollowerAndFollowee(follower: UserSummary, followee: UserSummary): Optional<FollowSummary>

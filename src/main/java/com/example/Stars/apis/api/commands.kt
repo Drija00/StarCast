@@ -1,9 +1,7 @@
 package com.example.Stars.apis.api
 
-import com.example.Stars.write_model.User
+import com.example.Stars.queries.read_model.NotificationStatus
 import org.axonframework.modelling.command.TargetAggregateIdentifier
-import org.springframework.cglib.core.Local
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -19,6 +17,7 @@ data class UserSetBackgroundImageCommand(@TargetAggregateIdentifier val userId: 
 data class FollowUserCommand(@TargetAggregateIdentifier val followId: UUID, val followerId: UUID, val followeeId: UUID, val timestamp : LocalDateTime, val active: Boolean)
 data class UnfollowUserCommand(@TargetAggregateIdentifier val followId: UUID, val followerId: UUID, val followeeId: UUID, val timestamp : LocalDateTime, val active: Boolean)
 
+data class MessageCommand(@TargetAggregateIdentifier val messageId: UUID, val content: String,val userId: UUID ,val timestamp: LocalDateTime, val status: NotificationStatus)
 
 data class PostStarCommand(@TargetAggregateIdentifier val starId: UUID, val content: String, val userId: UUID, val timestamp : LocalDateTime, val active: Boolean, val images: List<String>)
 data class UpdateStarCommand(@TargetAggregateIdentifier val starId: UUID, val content: String, val userId: UUID, val timestamp : LocalDateTime)
