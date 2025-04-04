@@ -14,10 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Profile;
 
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Aggregate
 @Profile("write_user")
@@ -40,9 +37,11 @@ public class User {
     private String backgroundImage;
 
     private Set<UUID> following = new HashSet<>();
+    private List<Notification> notifications = new ArrayList<>();
     //private Set<UUID> followers = new HashSet<>();
 
-    public User() {}
+    public User() {
+    }
 
     public User(UUID user_id) {
         this.user_id = user_id;
@@ -67,41 +66,45 @@ public class User {
     @CommandHandler
     public void handle(LoggingCommand cmd) {
         AggregateLifecycle.apply(
-          new UserLogingEvent(
-                  cmd.getUserId(),
-                  cmd.getActive()
-          )
-        );
-    }
-    @CommandHandler
-    public void handle(UserSetProfileImageCommand cmd) {
-        AggregateLifecycle.apply(
-          new UserSetProfileImageEvent(
-                  cmd.getUserId(),
-                  cmd.getProfileImageUrl()
-          )
-        );
-    }
-    @CommandHandler
-    public void handle(UserSetDescriptionCommand cmd) {
-        AggregateLifecycle.apply(
-          new UserSetDescriptionEvent(
-                  cmd.getUserId(),
-                  cmd.getDescription()
-          )
-        );
-    }
-    @CommandHandler
-    public void handle(UserSetBackgroundImageCommand cmd) {
-        AggregateLifecycle.apply(
-          new UserSetBackgroundImageEvent(
-                  cmd.getUserId(),
-                  cmd.getBackgroundImage()
-          )
+                new UserLogingEvent(
+                        cmd.getUserId(),
+                        cmd.getActive()
+                )
         );
     }
 
-    @EventSourcingHandler public User on(@NotNull UserRegisteredEvent event) {
+    @CommandHandler
+    public void handle(UserSetProfileImageCommand cmd) {
+        AggregateLifecycle.apply(
+                new UserSetProfileImageEvent(
+                        cmd.getUserId(),
+                        cmd.getProfileImageUrl()
+                )
+        );
+    }
+
+    @CommandHandler
+    public void handle(UserSetDescriptionCommand cmd) {
+        AggregateLifecycle.apply(
+                new UserSetDescriptionEvent(
+                        cmd.getUserId(),
+                        cmd.getDescription()
+                )
+        );
+    }
+
+    @CommandHandler
+    public void handle(UserSetBackgroundImageCommand cmd) {
+        AggregateLifecycle.apply(
+                new UserSetBackgroundImageEvent(
+                        cmd.getUserId(),
+                        cmd.getBackgroundImage()
+                )
+        );
+    }
+
+    @EventSourcingHandler
+    public User on(@NotNull UserRegisteredEvent event) {
 
         System.out.println("Event stored: " + event);
         this.user_id = event.getUserId();
@@ -113,7 +116,8 @@ public class User {
         return this;
     }
 
-    @EventSourcingHandler public void on(@NotNull UserLogingEvent event) {
+    @EventSourcingHandler
+    public void on(@NotNull UserLogingEvent event) {
         this.active = event.getActive();
     }
 
@@ -127,24 +131,24 @@ public class User {
         }
     }
 
-    // Event handler for following a user
     @EventSourcingHandler
     public void on(@NotNull UserUserFollowedEvent event) {
         this.user_id = event.getFollowerId();
         this.following.add(event.getFolloweeId());
-    }// Event handler for following a user
+    }
+
     @EventSourcingHandler
     public void on(@NotNull UserSetBackgroundImageEvent event) {
         this.user_id = event.getUserId();
-        this.backgroundImage= event.getBackgroundImage();
-    }// Event handler for following a user
+        this.backgroundImage = event.getBackgroundImage();
+    }
+
     @EventSourcingHandler
     public void on(@NotNull UserSetProfileImageEvent event) {
         this.user_id = event.getUserId();
-        this.profileImage= event.getProfileImageUrl();
+        this.profileImage = event.getProfileImageUrl();
     }
 
-    // Command to unfollow a user
     @CommandHandler
     public void handle(UserUnfollowedCommand command) {
         if (this.following.contains(command.getFolloweeId())) {
@@ -155,11 +159,35 @@ public class User {
         }
     }
 
-    // Event handler for unfollowing a user
+    @CommandHandler
+    public void handle(AddNotificationCommand cmd) {
+        AggregateLifecycle.apply(new NotificationAddedEvent(cmd.getUserId(), cmd.getNotificationId(), cmd.getContent(), cmd.getStatus()));
+    }
+
+    @CommandHandler
+    public void handle(MarkNotificationsSeenCommand cmd) {
+        AggregateLifecycle.apply(new NotificationsSeenEvent(cmd.getUserId(), cmd.getNotificationIds()));
+    }
+
     @EventSourcingHandler
     public void on(@NotNull UserUserUnfollowedEvent event) {
-
         this.user_id = event.getFollowerId();
         this.following.remove(event.getFolloweeId());
+    }
+
+    @EventSourcingHandler
+    public void on(NotificationAddedEvent event) {
+        if (this.user_id == event.getUserId()) {
+            notifications.add(new Notification(new MessageCommand(event.getNotificationId(), event.getContent(), event.getUserId(), LocalDateTime.now(), event.getStatus(), false)));
+        }
+    }
+
+    @EventSourcingHandler
+    public void on(NotificationsSeenEvent event) {
+        for (UUID id : event.getNotificationIds()) {
+            //new MessageStatusChangeCommand(id);
+            notifications.removeIf(n -> n.getNotificationId().equals(id));
+
+        }
     }
 }

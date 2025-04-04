@@ -1,5 +1,6 @@
 package com.example.Stars.apis.api
 
+import com.example.Stars.queries.read_model.Notification
 import com.example.Stars.queries.read_model.NotificationStatus
 import org.axonframework.modelling.command.TargetAggregateIdentifier
 import java.time.LocalDateTime
@@ -17,7 +18,11 @@ data class UserSetBackgroundImageCommand(@TargetAggregateIdentifier val userId: 
 data class FollowUserCommand(@TargetAggregateIdentifier val followId: UUID, val followerId: UUID, val followeeId: UUID, val timestamp : LocalDateTime, val active: Boolean)
 data class UnfollowUserCommand(@TargetAggregateIdentifier val followId: UUID, val followerId: UUID, val followeeId: UUID, val timestamp : LocalDateTime, val active: Boolean)
 
-data class MessageCommand(@TargetAggregateIdentifier val messageId: UUID, val content: String,val userId: UUID ,val timestamp: LocalDateTime, val status: NotificationStatus)
+data class MessageCommand(@TargetAggregateIdentifier val messageId: UUID, val content: String,val userId: UUID ,val timestamp: LocalDateTime, val status: NotificationStatus, val seen: Boolean)
+data class MessageStatusChangeCommand(@TargetAggregateIdentifier val messageId: UUID)
+
+data class AddNotificationCommand (@TargetAggregateIdentifier val userId: UUID,val notificationId: UUID, val content: String, val status: NotificationStatus)
+data class MarkNotificationsSeenCommand(@TargetAggregateIdentifier val userId: UUID, val notificationIds: List<UUID>)
 
 data class PostStarCommand(@TargetAggregateIdentifier val starId: UUID, val content: String, val userId: UUID, val timestamp : LocalDateTime, val active: Boolean, val images: List<String>)
 data class UpdateStarCommand(@TargetAggregateIdentifier val starId: UUID, val content: String, val userId: UUID, val timestamp : LocalDateTime)

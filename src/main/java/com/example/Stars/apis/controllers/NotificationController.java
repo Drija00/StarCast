@@ -6,14 +6,13 @@ import com.example.Stars.DTOs.StarDTO;
 import com.example.Stars.apis.service.NotificationDBService;
 import com.example.Stars.apis.service.notification.NotificationService;
 import com.example.Stars.queries.read_model.PageResult;
+import com.example.Stars.write_model.User;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -32,4 +31,12 @@ public class NotificationController {
     public CompletableFuture<ResponseEntity<PageResult<NotificationDTO>>> getLikes(@RequestParam UUID userId, int offset, int limit){
         return mNotificationService.getNotificatonsFrUser(userId, offset, limit);
     }
+
+    @PutMapping("/notifications/status")
+    public void updateStatuses(@RequestParam UUID userId, @RequestBody List<UUID> notifications) throws Exception {
+        if (notifications != null || !notifications.isEmpty()) {
+            mNotificationService.changeSeenStatus(userId,notifications);
+        }
+    }
+
 }

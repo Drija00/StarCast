@@ -14,11 +14,11 @@ public class NotificationConverter implements DtoEntityConverter<NotificationDTO
 
     @Override
     public NotificationDTO toDto(Notification notification) {
-        return new NotificationDTO(notification.getNotificationId(),notification.getMessage(),notification.getTimestamp(),notification.getStatus(),userConverter.toDto(notification.getUser()));
+        return new NotificationDTO(notification.getNotificationId(),notification.getMessage(),notification.getTimestamp(),notification.getStatus(),userConverter.toDto(notification.getUser()),notification.isSeen());
     }
 
     @Override
     public Notification toEntity(NotificationDTO notificationDTO) {
-        return null;
+        return new Notification(notificationDTO.getNotificationID(),notificationDTO.getStatus(),userConverter.toEntity(notificationDTO.getUser()), notificationDTO.getContent(), notificationDTO.isSeen(), notificationDTO.getTimestamp());
     }
 }

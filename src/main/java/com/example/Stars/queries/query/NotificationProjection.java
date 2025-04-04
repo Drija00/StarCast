@@ -3,6 +3,8 @@ package com.example.Stars.queries.query;
 import com.example.Stars.DTOs.NotificationDTO;
 import com.example.Stars.DTOs.UserDTO;
 import com.example.Stars.apis.api.MessageEvent;
+import com.example.Stars.apis.api.MessageStatusChangeEvent;
+import com.example.Stars.apis.api.NotificationsSeenEvent;
 import com.example.Stars.converter.impl.NotificationConverter;
 import com.example.Stars.queries.read_model.Notification;
 import com.example.Stars.queries.read_model.PageResult;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -49,11 +52,24 @@ public class NotificationProjection {
             event.getMessageId(),
             event.getStatus(),
             new UserSummary(event.getUserId()),
-                event.getContent(),
-                event.getTimestamp()
+            event.getContent(),
+            event.getSeen(),
+            event.getTimestamp()
         );
 
         notificationRepository.save(notification);
+    }
+
+    @EventHandler
+    public void handle(NotificationsSeenEvent evt){
+
+        for (UUID id : evt.getNotificationIds()) {
+            Notification notification = notificationRepository.findById(id).orElseThrow(()->new RuntimeException("Notification not found"));
+
+            notification.setSeen(true);
+
+            notificationRepository.save(notification);
+        }
     }
 
     @QueryHandler

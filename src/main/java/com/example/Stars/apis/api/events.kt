@@ -1,5 +1,6 @@
 package com.example.Stars.apis.api
 
+import com.example.Stars.queries.read_model.Notification
 import com.example.Stars.queries.read_model.NotificationStatus
 import com.example.Stars.write_model.User
 import org.axonframework.modelling.command.TargetAggregateIdentifier
@@ -18,7 +19,11 @@ data class UserSetBackgroundImageEvent(val userId: UUID, val backgroundImage: St
 data class UserFollowedEvent(val followId: UUID, val followerId: UUID, val followeeId: UUID, val timestamp : LocalDateTime, val active: Boolean)
 data class UserUnfollowedEvent(val followId: UUID, val followerId: UUID, val followeeId: UUID, val timestamp : LocalDateTime, val active: Boolean)
 
-data class MessageEvent(val messageId: UUID, val content: String,val userId: UUID ,val timestamp: LocalDateTime, val status: NotificationStatus)
+data class MessageEvent(val messageId: UUID, val content: String,val userId: UUID ,val timestamp: LocalDateTime, val status: NotificationStatus, val seen: Boolean)
+data class MessageStatusChangeEvent(val messageId: UUID)
+
+data class NotificationAddedEvent (val userId: UUID,val notificationId: UUID, val content: String, val status: NotificationStatus)
+data class NotificationsSeenEvent (val userId: UUID, val notificationIds: List<UUID>)
 
 data class StarPostedEvent(val starId: UUID, val content: String, val userId: UUID, val timestamp : LocalDateTime, val active: Boolean, val images: List<String>)
 data class StarUpdatedEvent(val starId: UUID, val content: String, val user: User, val timestamp : LocalDateTime)

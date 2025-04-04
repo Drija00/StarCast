@@ -3,6 +3,7 @@ package com.example.Stars.apis.service;
 import com.example.Stars.DTOs.LikeDTO;
 import com.example.Stars.DTOs.StarDTO;
 import com.example.Stars.DTOs.UserDTO;
+import com.example.Stars.apis.api.AddNotificationCommand;
 import com.example.Stars.apis.api.LikeStarCommand;
 import com.example.Stars.apis.api.MessageCommand;
 import com.example.Stars.apis.api.UnlikeStarCommand;
@@ -10,6 +11,7 @@ import com.example.Stars.queries.read_model.Notification;
 import com.example.Stars.apis.service.notification.NotificationService;
 import com.example.Stars.queries.read_model.NotificationStatus;
 import com.example.Stars.queries.query.*;
+import com.example.Stars.queries.read_model.UserSummary;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
@@ -55,18 +57,33 @@ public class LikeService {
                     true
             );
             commandGateway.sendAndWait(cmd);
+            UUID id = UUID.randomUUID();
             MessageCommand cmdMsg = new MessageCommand(
-                    UUID.randomUUID(),
+                    id,
                     "User "+u.getUsername()+" liked your \""+ s.getContent().substring(0,10) +"...\" star!",
                     s.getUser().getUserId(),
                     LocalDateTime.now(),
-                    NotificationStatus.LIKE
+                    NotificationStatus.LIKE,
+                    false
             );
             commandGateway.sendAndWait(cmdMsg);
+
+
+            AddNotificationCommand cmdNtf = new AddNotificationCommand(
+                u.getUserId(),
+                id,
+                "User "+u.getUsername()+" liked your \""+ s.getContent().substring(0,10) +"...\" star!",
+                NotificationStatus.LIKE
+            );
+            commandGateway.sendAndWait(cmdNtf);
+
             notificationService.sendNotification(
                     s.getUser().getUserId(),
                     Notification.builder()
+                            .notificationId(id)
+                            .seen(false)
                             .status(NotificationStatus.LIKE)
+                            .user(new UserSummary(s.getUser().getUserId()))
                             .message("User "+u.getUsername()+" liked your \""+ s.getContent().substring(0,10) +"...\" star!")
                             .build()
             );

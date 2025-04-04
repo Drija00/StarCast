@@ -83,7 +83,8 @@ public class UserService {
                     "User " + follower.getUsername() + "joined your galaxy!",
                     u.getUserId(),
                     LocalDateTime.now(),
-                    NotificationStatus.FOLLOW
+                    NotificationStatus.FOLLOW,
+                    false
             );
             commandGateway.sendAndWait(cmdMsg);
 

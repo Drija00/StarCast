@@ -27,6 +27,7 @@ public class Notification {
     @JoinColumn(name = "user_id", nullable = false)
     private UserSummary user;
     private String message;
+    private boolean seen = false;
     private LocalDateTime timestamp;
 
 }
